@@ -4,6 +4,8 @@ build/
 *.iml
 .DS_Store
 __pycache__/
+node_modules/
+dist-pages/
 
 config/local.properties
 *.log

@@ -1,0 +1,13 @@
+{
+  "name": "sql-product-lab-pages",
+  "private": true,
+  "scripts": {
+    "build:pages": "node scripts/build-pages.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.8"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

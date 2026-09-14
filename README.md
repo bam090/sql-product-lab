@@ -1,5 +1,11 @@
 # 작은 상점 SQL 실험실
 
+**[브라우저에서 바로 풀기 →](https://bam090.github.io/sql-product-lab/)**
+
+설치나 로그인 없이 상품 데이터로 SQL을 연습할 수 있습니다. 기초 16문제와 응용·종합 10문제가 있으며, 문법 틀·자동완성·조회 결과·기대 결과 비교를 제공합니다.
+
+공유 페이지는 **PGlite(PostgreSQL)**를 각자의 브라우저에서 실행합니다. 외부 DB에 연결하지 않으며, 저장한 SQL도 해당 브라우저에 보관됩니다. 다른 기기와 동기화되지 않고 브라우저 데이터를 지우면 삭제될 수 있습니다. 첫 접속 때는 DB 엔진을 내려받고 상품 데이터를 준비하는 시간이 필요합니다.
+
 ## 1. 이번 연습
 
 **아주 쉬운 한 줄 조회부터 시작해, 오늘 배운 SQL로 상품을 찾고 결과를 가공하는 연습입니다. 직접 작성할 코드는 `sql/` 안의 SELECT 문뿐입니다.**
@@ -14,7 +20,13 @@
 
 ## 2. 실행하기
 
-GitHub에서 내려받았다면 먼저 아래 **처음 실행하는 사람의 DB 설정**을 완료하세요. Java 서버를 직접 실행하는 프로젝트이며 GitHub Pages용 사이트는 아닙니다.
+### 링크로 바로 연습하기
+
+위 **브라우저에서 바로 풀기** 링크를 열고 DB 준비가 끝나면 문제를 선택하세요. 공유 페이지의 저장 버튼은 본인 브라우저에 SQL을 저장합니다. Java 설치와 Supabase 설정은 필요 없습니다.
+
+### IntelliJ에서 Java 버전 실행하기
+
+직접 프로젝트를 실행하고 SQL 파일을 편집하려면 아래 순서를 따르세요. GitHub에서 처음 내려받았다면 먼저 아래 **처음 실행하는 사람의 DB 설정**을 완료하세요. 이 버전은 Java 서버와 본인의 DB를 사용합니다.
 
 1. IntelliJ에서 **이 README가 있는 `sql-product-lab` 폴더**를 엽니다.
 2. Project SDK와 Gradle JVM을 **Java 25**로 선택합니다. 수업의 BlogRest와 같은 **Spring Boot 4.1.1**입니다.
@@ -402,7 +414,20 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 | 4 | I1 | 종합 조회: 조건과 결과 가공 |
 | 선택 | O1~O2 | 대소문자 검색과 하루 날짜 범위 |
 
-B1부터 한 문제씩 실행하고 기대 결과와 비교하세요. 문제를 옮기기 전에 작성한 SQL을 **파일에 저장**하면 `sql/문제번호.sql`에 풀이가 남습니다.
+B1부터 한 문제씩 실행하고 기대 결과와 비교하세요. 공유 페이지는 **브라우저에 저장**, Java 버전은 **파일에 저장**을 사용합니다. Java 버전에서는 `sql/문제번호.sql`에 풀이가 남습니다.
+
+## 6. 공유 페이지 수정·배포
+
+Node.js 22 환경에서 아래 명령으로 공유 페이지를 만듭니다.
+
+```bash
+npm ci
+npm run build:pages
+```
+
+`dist-pages/`에 생성된 파일만 GitHub Pages에 배포됩니다. `main` 브랜치에 변경을 올리면 GitHub Actions가 테스트·빌드·배포를 수행합니다. Java 화면과 문제 목록을 재사용하며, 공유용 시작 SQL은 문제 목록에서 생성하므로 로컬에서 작성 중인 풀이 파일이 배포물에 섞이지 않습니다.
+
+브라우저 DB: [PGlite](https://pglite.dev/docs/about)
 
 공식 문서: [PostgreSQL SELECT](https://www.postgresql.org/docs/current/sql-select.html) · [조건식과 NULL](https://www.postgresql.org/docs/current/functions-comparison.html) · [Supabase 연결 방법](https://supabase.com/docs/guides/database/connecting-to-postgres)
 

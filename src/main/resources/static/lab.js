@@ -11,6 +11,7 @@ const BRANCH_LABELS = {
   'codex/integration': '03 종합 조회'
 };
 async function api(path, options = {}) {
+  if (window.SqlLabPagesApi) return window.SqlLabPagesApi(path, options);
   let response;
   try { response = await fetch(path, options); }
   catch (_) { throw new Error('실행 서버에 연결되지 않았어요. ReviewApplication이 실행 중인지 확인한 뒤 다시 시도해 주세요.'); }
@@ -148,7 +149,7 @@ async function select(exercise) {
   $('title').textContent = exercise.title;
   $('step').textContent = `${exercise.id} / ${exercise.optional ? '선택 연습' : '핵심 연습'}`;
   $('minutes').textContent = `약 ${exercise.minutes}분`;
-  $('filename').textContent = `sql/${exercise.id}.sql`;
+  $('filename').textContent = window.SqlLabPagesApi ? `브라우저 저장 · ${exercise.id}` : `sql/${exercise.id}.sql`;
   $('requirements').replaceChildren(...exercise.requirements.map((r) => cell('li', r)));
   $('syntax-frame').hidden = !exercise.syntaxFrame;
   $('syntax-frame').textContent = exercise.syntaxFrame ? `문법 틀: ${exercise.syntaxFrame}` : '';
@@ -167,7 +168,7 @@ async function load(force) {
   try {
     if (!force && drafts.has(current.id)) { $('sql').value = drafts.get(current.id); dirty = true; }
     else { const loaded = await api(`/api/sql/${selectedId}`); if (revision !== selectionRevision) return; $('sql').value = loaded.sql; dirty = false; drafts.delete(selectedId); }
-    $('save-status').textContent = dirty ? '아직 파일에 저장하지 않은 내용이 있어요.' : '파일 내용을 불러왔어요.';
+    $('save-status').textContent = dirty ? '아직 저장하지 않은 내용이 있어요.' : (window.SqlLabPagesApi ? '브라우저 저장본을 불러왔어요.' : '파일 내용을 불러왔어요.');
   } catch (e) { if (revision === selectionRevision) error(e.message); }
   finally { if (revision === selectionRevision) { $('sql').readOnly = false; $('run').disabled = false; $('save').disabled = false; } }
 }
@@ -182,7 +183,7 @@ $('save').addEventListener('click', async () => {
   try {
     await api(`/api/sql/${savedId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sql: savedSql }) });
     drafts.delete(savedId);
-    if (current.id === savedId && $('sql').value === savedSql) { dirty = false; $('save-status').textContent = `sql/${savedId}.sql에 저장했어요.`; }
+    if (current.id === savedId && $('sql').value === savedSql) { dirty = false; $('save-status').textContent = window.SqlLabPagesApi ? '이 브라우저에 저장했어요.' : `sql/${savedId}.sql에 저장했어요.`; }
   } catch (e) { error(e.message); }
 });
 async function run() {
@@ -195,7 +196,8 @@ async function run() {
     const result = await api('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exerciseId: current.id, sql: $('sql').value }) });
     table($('result'), result.columns, result.rows);
     $('result-meta').textContent = `${result.rowCount}행 · ${result.elapsedMs}ms${result.truncated ? ' · 최대 200행만 표시' : ''}`;
-    const same = SqlResultComparison.matches(result, current);
+    const comparedExercise = window.SqlLabPagesApi?.comparisonExercise?.(current) || current;
+    const same = SqlResultComparison.matches(result, comparedExercise);
     const retry = current.orderMatters === false ? '반환 열과 값을 확인해 보세요.' : '반환 열·값·정렬 순서를 확인해 보세요.';
     comparison(same ? '정답이에요 · 기대 결과와 같아요' : `아직 정답이 아니에요 · ${retry}`, same ? '' : 'mismatch');
   } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(); $('result-meta').textContent = ''; }
@@ -298,8 +300,8 @@ async function init() {
     });
     await select(catalog.exercises[0]);
     $('open-source').disabled = false;
-    try { await api('/api/health'); $('connection').textContent = 'Supabase 연결됨'; }
-    catch (_) { $('connection').textContent = 'DB 연결 준비 중'; $('connection').classList.add('offline'); }
+    try { await api('/api/health'); $('connection').textContent = window.SqlLabPagesApi ? '브라우저 DB 준비됨' : 'Supabase 연결됨'; }
+    catch (_) { $('connection').textContent = window.SqlLabPagesApi ? '브라우저 DB 초기화 실패' : 'DB 연결 준비 중'; $('connection').classList.add('offline'); }
   } catch (e) { error(e.message); }
 }
 init();
