@@ -10,7 +10,8 @@ a { color: inherit; }
 .status, .pill { font-size: 12px; padding: 4px 12px; border-radius: 30px; background: var(--pale); white-space: nowrap; }
 .status.offline { color: var(--error); background: #f8eaea; }
 .layout { max-width: 1540px; margin: auto; display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 38px; padding: 42px 5vw; }
-.layout > aside { align-self: start; position: sticky; top: 30px; }
+.layout > aside { align-self: start; position: sticky; top: 30px; max-height: calc(100vh - 60px); overflow-y: auto; scrollbar-gutter: stable; }
+.layout > aside:focus-visible { outline: 2px solid #52796f; outline-offset: 3px; }
 main { min-width: 0; }
 .eyebrow { text-transform: uppercase; font-size: 11px; font-weight: 750; letter-spacing: 1.1px; color: #52796f; margin: 0 0 12px; }
 h1 { font-size: 31px; line-height: 1.4; margin: 0 0 15px; letter-spacing: -1.2px; }
@@ -115,7 +116,7 @@ dialog::backdrop { background: rgba(31, 45, 48, .46); }
   .topbar { padding: 0 20px; }
   .brand span { display: none; }
   .layout { display: block; padding: 20px 14px; }
-  .layout > aside { position: static; }
+  .layout > aside { position: static; max-height: none; overflow: visible; }
   h1 { font-size: 26px; }
   h1 br { display: none; }
   nav { margin: 16px 0; display: flex; overflow-x: auto; gap: 6px; }
