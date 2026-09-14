@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 let catalog, current, dirty = false, busy = false, selectionRevision = 0;
 let sourceDialogTrigger = null, sourceRevision = 0;
+let autocompleteCandidates = [], autocompleteMatch = null, autocompleteIndex = 0, composing = false;
 const drafts = new Map();
 const SOURCE_TABLE_SQL = 'SELECT * FROM practice.products ORDER BY product_id';
 const BRANCH_LABELS = {
@@ -34,8 +35,70 @@ function table(target, columns, rows) {
   t.append(body); target.append(t);
 }
 function error(message) { $('error').hidden = !message; $('error').textContent = message; }
+function markSqlDirty() {
+  dirty = true;
+  $('save-status').textContent = '저장하지 않은 변경 사항';
+}
+function closeAutocomplete() {
+  autocompleteMatch = null;
+  autocompleteIndex = 0;
+  $('sql-suggestions').hidden = true;
+  $('sql-suggestions').replaceChildren();
+  $('sql').setAttribute('aria-expanded', 'false');
+  $('sql').removeAttribute('aria-activedescendant');
+}
+function selectAutocomplete(index) {
+  if (!autocompleteMatch) return;
+  autocompleteIndex = (index + autocompleteMatch.items.length) % autocompleteMatch.items.length;
+  [...$('sql-suggestions').children].forEach((option, optionIndex) => {
+    option.setAttribute('aria-selected', optionIndex === autocompleteIndex ? 'true' : 'false');
+  });
+  const active = $(`sql-suggestion-${autocompleteIndex}`);
+  $('sql').setAttribute('aria-activedescendant', active.id);
+  active.scrollIntoView({ block: 'nearest' });
+}
+function renderAutocomplete(match) {
+  autocompleteMatch = match;
+  autocompleteIndex = 0;
+  const options = match.items.map((item, index) => {
+    const option = document.createElement('div');
+    option.id = `sql-suggestion-${index}`;
+    option.className = 'autocomplete-option';
+    option.setAttribute('role', 'option');
+    option.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    const value = cell('span', item.value), kind = cell('span', item.kind);
+    value.className = 'autocomplete-value'; kind.className = 'autocomplete-kind';
+    option.append(value, kind);
+    option.addEventListener('mouseenter', () => selectAutocomplete(index));
+    option.addEventListener('mousedown', (event) => event.preventDefault());
+    option.addEventListener('click', () => acceptAutocomplete(index));
+    return option;
+  });
+  $('sql-suggestions').replaceChildren(...options);
+  $('sql-suggestions').hidden = false;
+  $('sql').setAttribute('aria-expanded', 'true');
+  $('sql').setAttribute('aria-activedescendant', options[0].id);
+}
+function refreshAutocomplete() {
+  const editor = $('sql');
+  if (composing || editor.readOnly || editor.selectionStart !== editor.selectionEnd) {
+    closeAutocomplete();
+    return;
+  }
+  const match = SqlAutocomplete.completions(editor.value, editor.selectionStart, autocompleteCandidates);
+  if (match) renderAutocomplete(match);
+  else closeAutocomplete();
+}
+function acceptAutocomplete(index) {
+  if (!autocompleteMatch) return;
+  const item = autocompleteMatch.items[index], range = autocompleteMatch.range;
+  $('sql').setRangeText(item.value, range.start, range.end, 'end');
+  markSqlDirty();
+  closeAutocomplete();
+}
 async function select(exercise) {
   if (busy) return;
+  closeAutocomplete();
   if (current && dirty) drafts.set(current.id, $('sql').value);
   current = exercise;
   selectionRevision++;
@@ -55,6 +118,7 @@ async function select(exercise) {
   await load(false);
 }
 async function load(force) {
+  closeAutocomplete();
   const revision = selectionRevision, selectedId = current.id;
   if (force && dirty && !confirm('저장하지 않은 SQL을 파일 내용으로 바꿀까요?')) return;
   try {
@@ -64,7 +128,11 @@ async function load(force) {
   } catch (e) { if (revision === selectionRevision) error(e.message); }
   finally { if (revision === selectionRevision) { $('sql').readOnly = false; $('run').disabled = false; $('save').disabled = false; } }
 }
-$('sql').addEventListener('input', () => { dirty = true; $('save-status').textContent = '저장하지 않은 변경 사항'; });
+$('sql').addEventListener('input', () => { markSqlDirty(); if (!composing) refreshAutocomplete(); });
+$('sql').addEventListener('compositionstart', () => { composing = true; closeAutocomplete(); });
+$('sql').addEventListener('compositionend', () => { composing = false; refreshAutocomplete(); });
+$('sql').addEventListener('click', refreshAutocomplete);
+$('sql').addEventListener('blur', closeAutocomplete);
 $('reload').addEventListener('click', () => load(true));
 $('save').addEventListener('click', async () => {
   const savedId = current.id, savedSql = $('sql').value;
@@ -76,6 +144,7 @@ $('save').addEventListener('click', async () => {
 });
 async function run() {
   if (busy || !current || $('sql').readOnly) return;
+  closeAutocomplete();
   busy = true; $('run').disabled = true; $('run').textContent = '실행 중…'; error(''); $('comparison').textContent = '';
   $('after-run').hidden = false;
   try {
@@ -90,7 +159,19 @@ async function run() {
   finally { busy = false; $('run').disabled = false; $('run').textContent = '실행하기 →'; }
 }
 $('run').addEventListener('click', run);
-$('sql').addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); } });
+$('sql').addEventListener('keydown', (e) => {
+  if (e.isComposing || composing) return;
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); closeAutocomplete(); run(); return; }
+  if (!autocompleteMatch) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); selectAutocomplete(autocompleteIndex + 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); selectAutocomplete(autocompleteIndex - 1); }
+  else if (e.key === 'Tab') { e.preventDefault(); acceptAutocomplete(autocompleteIndex); }
+  else if (e.key === 'Escape') { e.preventDefault(); closeAutocomplete(); }
+  else if (e.key === 'Enter') closeAutocomplete();
+});
+$('sql').addEventListener('keyup', (e) => {
+  if (!composing && !autocompleteMatch && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) refreshAutocomplete();
+});
 async function openSourceTable() {
   if (!current) return;
   const dialog = $('source-dialog');
@@ -141,6 +222,7 @@ window.addEventListener('beforeunload', (e) => { if (dirty || drafts.size) { e.p
 async function init() {
   try {
     catalog = await api('/api/exercises');
+    autocompleteCandidates = SqlAutocomplete.createCandidates(catalog.schema);
     $('schema-description').textContent = catalog.schema.description;
     $('schema-count').textContent = `${catalog.schema.seedRowCount}행`;
     catalog.schema.columns.forEach((c) => { const tr = document.createElement('tr'); [c.name,c.type,c.description].forEach((v) => tr.append(cell('td',v))); $('schema').append(tr); });

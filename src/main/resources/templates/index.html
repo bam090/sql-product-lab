@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>작은 상점 · SQL 실험실</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="/autocomplete.js" defer></script>
   <script src="/lab.js" defer></script>
 </head>
 <body>
@@ -55,9 +56,12 @@
                 <label id="editor-title" for="sql">쿼리 작성</label>
                 <code id="filename"></code>
               </div>
-              <textarea id="sql" spellcheck="false" autocapitalize="off" aria-describedby="editor-help" placeholder="SELECT ..."></textarea>
+              <div class="autocomplete-wrap">
+                <textarea id="sql" spellcheck="false" autocapitalize="off" aria-describedby="editor-help" aria-autocomplete="list" aria-controls="sql-suggestions" aria-expanded="false" placeholder="SELECT ..."></textarea>
+                <div id="sql-suggestions" class="autocomplete-list" role="listbox" aria-label="SQL 자동완성 후보" hidden></div>
+              </div>
               <div class="editor-footer">
-                <span id="editor-help" class="muted">⌘ / Ctrl + Enter로 실행 · 파일 저장은 별도</span>
+                <span id="editor-help" class="muted">자동완성: ↑↓ 선택 · Tab 확정 · Esc 닫기 · ⌘ / Ctrl + Enter 실행</span>
                 <div class="actions">
                   <button id="reload" class="secondary" type="button">파일 다시 읽기</button>
                   <button id="save" class="secondary" type="button">파일에 저장</button>
