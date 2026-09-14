@@ -1,5 +1,6 @@
 # Copy this file to config/local.properties. The copied file is ignored by Git.
-# Use the direct Postgres connection values for the separate practice project.
-lab.database.url=jdbc:postgresql://db.PROJECT_REF.supabase.co:5432/postgres
-lab.database.user=practice_reader
+# Copy the Session pooler host from the separate project's Connect dialog.
+# The custom role username is practice_reader.PROJECT_REF.
+lab.database.url=jdbc:postgresql://POOLER_HOST:5432/postgres
+lab.database.user=practice_reader.PROJECT_REF
 lab.database.password=replace-me
