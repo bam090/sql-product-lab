@@ -2,7 +2,8 @@
 
 ## 1. 이번 연습
 
-**아주 쉬운 한 줄 조회부터 시작해, 오늘 배운 SQL로 상품을 찾고 결과를 가공하는 연습입니다. 직접 작성할 코드는 `sql/` 안의 SELECT 문뿐입니다.**
+**아주 쉬운 한 줄 조회부터 시작해, 오늘 배운 SQL로 상품을 찾고 결과를 가공하는 연습입니다. 
+직접 작성할 코드는 `sql/` 안의 SELECT 문뿐입니다.**
 
 - 핵심: SELECT · FROM · AS · 문자열 · ORDER BY · 계산식 · DISTINCT · WHERE · AND/OR · IN · BETWEEN · LIKE · NULL · LIMIT · 날짜 범위
 - 예상 시간: 워밍업을 포함한 핵심 약 78분, 선택 약 10분. 한 번에 끝내지 않아도 됩니다.
@@ -10,11 +11,13 @@
 - 미리 구현한 부분: 화면, SQL 파일 읽기·저장, 쿼리 실행, 결과 표, 오류 표시, 기대 결과 비교.
 - 정답 SQL은 이 프로젝트에 포함하지 않았습니다.
 
-화면 하나에서 **워밍업 → 기본 조회 → 조건 조회 → 종합 조회** 순서로 모든 문제를 풀 수 있습니다. 처음에는 B1을 선택해 SQL 한 문장의 모양부터 익혀 보세요.
+화면 하나에서 **워밍업 → 기본 조회 → 조건 조회 → 종합 조회** 순서로 모든 문제를 풀 수 있습니다. 
+처음에는 B1을 선택해 SQL 한 문장의 모양부터 익혀 보세요.
 
 ## 2. 실행하기
 
-GitHub에서 내려받았다면 먼저 아래 **처음 실행하는 사람의 DB 설정**을 완료하세요. Java 서버를 직접 실행하는 프로젝트이며 GitHub Pages용 사이트는 아닙니다.
+GitHub에서 내려받았다면 먼저 아래 **처음 실행하는 사람의 DB 설정**을 완료하세요. 
+Java 서버를 직접 실행하는 프로젝트이며 GitHub Pages용 사이트는 아닙니다.
 
 1. IntelliJ에서 **이 README가 있는 `sql-product-lab` 폴더**를 엽니다.
 2. Project SDK와 Gradle JVM을 **Java 25**로 선택합니다. 수업의 BlogRest와 같은 **Spring Boot 4.1.1**입니다.
@@ -28,18 +31,24 @@ GitHub에서 내려받았다면 먼저 아래 **처음 실행하는 사람의 DB
 5. 화면에서 SQL을 작성하고 **실행하기**를 누릅니다. 결과와 기대 결과를 비교합니다.
 6. **파일에 저장**을 누르면 해당 `sql/문제번호.sql`에 저장됩니다. 실행만 누르면 파일을 덮어쓰지 않습니다.
 
-IntelliJ에서 SQL 파일을 수정했다면 저장 후 화면의 **파일 다시 읽기**를 누르세요. 오류가 나면 입력한 SQL이 유지되고, 같은 화면 아래에 빨간 오류 메시지가 표시됩니다. `⌘ + Enter` 또는 `Ctrl + Enter`로도 실행할 수 있습니다.
+IntelliJ에서 SQL 파일을 수정했다면 저장 후 화면의 **파일 다시 읽기**를 누르세요. 오류가 나면 입력한 SQL이 유지되고 
+같은 화면 아래에 빨간 오류 메시지가 표시됩니다. `⌘ + Enter` 또는 `Ctrl + Enter`로도 실행할 수 있습니다.
 
-SQL 편집기에서 한 글자 이상 입력하면 키워드·테이블·컬럼명 후보가 나타납니다. `↑`·`↓`로 고르고 `Enter` 또는 `Tab`으로 확정하며, `Esc`로 닫을 수 있습니다. 후보가 없을 때 `Enter`는 줄바꿈, `Tab`은 공백 4칸 들여쓰기, `Shift + Tab`은 들여쓰기 줄이기입니다. 여러 줄을 선택해 함께 조절할 수도 있습니다. 편집기 밖으로 이동하려면 `Esc`를 누른 뒤 `Tab`을 누르세요.
+SQL 편집기에서 한 글자 이상 입력하면 키워드·테이블·컬럼명 후보가 나타납니다. `↑`·`↓`로 고르고 `Enter` 또는 `Tab`으로 확정하며 `Esc`로 닫을 수 있습니다. 
+후보가 없을 때 `Enter`는 줄바꿈, `Tab`은 공백 4칸 들여쓰기, `Shift + Tab`은 들여쓰기 줄이기입니다. 여러 줄을 선택해 함께 조절할 수도 있습니다. 
+편집기 밖으로 이동하려면 `Esc`를 누른 뒤 `Tab`을 누르세요.
 
-> **각자의 DB를 사용합니다.** 저장소에는 연습 데이터와 연결 설정 예시만 포함됩니다. 실제 접속 주소·계정·비밀번호는 포함하지 않습니다. 이미 로컬에 연결 설정을 마쳤다면 그대로 실행하세요.
+> **각자의 DB를 사용합니다.** 저장소에는 연습 데이터와 연결 설정 예시만 포함됩니다. 실제 접속 주소·계정·비밀번호는 포함하지 않습니다.
+> 이미 로컬에 연결 설정을 마쳤다면 그대로 실행하세요.
 
 <details>
 <summary>처음 실행하는 사람의 DB 설정</summary>
 
 1. 본인의 연습 전용 Supabase 프로젝트를 준비합니다. 기존 서비스 데이터가 있는 DB와 분리하세요.
-2. 해당 프로젝트의 SQL Editor에서 [setup/seed.sql](setup/seed.sql)을 **처음 한 번** 실행합니다. `practice.products` 테이블과 연습 상품 20개를 만듭니다. 테이블이 이미 있다면 반복 실행하지 마세요.
-3. 같은 SQL Editor에서 아래 초기 권한 설정을 한 번 실행합니다. 비밀번호 자리에는 본인이 생성한 비밀번호를 넣습니다. 이 계정에는 연습 테이블 조회 권한만 부여합니다.
+2. 해당 프로젝트의 SQL Editor에서 [setup/seed.sql](setup/seed.sql)을 **처음 한 번** 실행합니다. 
+    `practice.products` 테이블과 연습 상품 20개를 만듭니다. 테이블이 이미 있다면 반복 실행하지 마세요.
+3. 같은 SQL Editor에서 아래 초기 권한 설정을 한 번 실행합니다. 비밀번호 자리에는 본인이 생성한 비밀번호를 넣습니다. 
+    이 계정에는 연습 테이블 조회 권한만 부여합니다.
 
 ```sql
 CREATE ROLE practice_reader LOGIN PASSWORD '본인이_정한_비밀번호';
@@ -50,7 +59,9 @@ CREATE POLICY practice_reader_select ON practice.products
     FOR SELECT TO practice_reader USING (true);
 ```
 
-4. [config/local.properties.example](config/local.properties.example)을 같은 폴더의 `local.properties`로 복사합니다. Supabase의 **Connect → Session pooler**에서 호스트와 프로젝트 참조값을 확인해 아래 세 값을 채웁니다. 비밀번호는 위에서 만든 `practice_reader` 계정의 값입니다.
+4. [config/local.properties.example](config/local.properties.example)을 같은 폴더의 `local.properties`로 복사합니다.
+5. Supabase의 **Connect → Session pooler**에서 호스트와 프로젝트 참조값을 확인해 아래 세 값을 채웁니다.
+6. 비밀번호는 위에서 만든 `practice_reader` 계정의 값입니다.
 
 ```properties
 lab.database.url=jdbc:postgresql://POOLER_HOST:5432/postgres
@@ -58,17 +69,21 @@ lab.database.user=practice_reader.PROJECT_REF
 lab.database.password=본인이_정한_비밀번호
 ```
 
-`POOLER_HOST`와 `PROJECT_REF`는 예시 문자열이므로 실제 값으로 바꿔야 합니다. 이 앱은 SSL 연결을 사용합니다. 실제 `config/local.properties`는 Git에서 제외되며, DB 관리자 계정이나 API 키를 넣지 않습니다.
+`POOLER_HOST`와 `PROJECT_REF`는 예시 문자열이므로 실제 값으로 바꿔야 합니다. 이 앱은 SSL 연결을 사용합니다. 
+실제 `config/local.properties`는 Git에서 제외되며, DB 관리자 계정이나 API 키를 넣지 않습니다.
 
 5. 위 실행 순서대로 서버를 켜고 화면에 **Supabase 연결됨**, 원본 테이블에 **20행**이 보이는지 확인합니다.
 
-초기 DB 준비는 한 번만 하면 됩니다. 이후 학습자가 작성할 과제는 `sql/`의 SELECT 문이며 INSERT·UPDATE·DELETE는 실습 화면에서 실행하지 않습니다. 자세한 연결 방식은 [Supabase 연결 안내](https://supabase.com/docs/guides/database/connecting-to-postgres), 계정 권한은 [Postgres Roles 안내](https://supabase.com/docs/guides/database/postgres/roles)를 참고하세요.
+초기 DB 준비는 한 번만 하면 됩니다. 이후 학습자가 작성할 과제는 `sql/`의 SELECT 문이며 INSERT·UPDATE·DELETE는 실습 화면에서 실행하지 않습니다. 
+자세한 연결 방식은 [Supabase 연결 안내](https://supabase.com/docs/guides/database/connecting-to-postgres), 
+계정 권한은 [Postgres Roles 안내](https://supabase.com/docs/guides/database/postgres/roles)를 참고하세요.
 
 </details>
 
 ## 3. 내가 구현할 부분
 
-워밍업 SQL 파일에는 한 줄 개념·문법 틀이 있고, 각 문제 파일에는 요구사항 주석과 TODO가 있습니다. **SELECT 문 하나**를 작성하세요. 테이블 이름은 `practice.products`로 고정합니다. 반환 열 이름도 아래 요구사항과 맞춰 주세요.
+워밍업 SQL 파일에는 한 줄 개념·문법 틀이 있고, 각 문제 파일에는 요구사항 주석과 TODO가 있습니다. **SELECT 문 하나**를 작성하세요. 
+테이블 이름은 `practice.products`로 고정합니다. 반환 열 이름도 아래 요구사항과 맞춰 주세요.
 
 | 컬럼 | 타입 | 의미 |
 | --- | --- | --- |
@@ -80,11 +95,13 @@ lab.database.password=본인이_정한_비밀번호
 | `description` | `text nullable` | NULL과 빈 문자열이 각각 포함된 설명 |
 | `released_at` | `timestamp without time zone` | 월말과 자정 경계를 포함한 출시 시각 |
 
-SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작은따옴표로 씁니다. `NULL`은 빈 문자열과 다릅니다. 날짜 범위는 시작 포함·다음 구간 시작 제외 방식도 연습합니다. 문제에 정렬이 지정되어 있으면 `ORDER BY`도 작성하세요.
+SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작은따옴표로 씁니다. `NULL`은 빈 문자열과 다릅니다. 
+날짜 범위는 시작 포함·다음 구간 시작 제외 방식도 연습합니다. 문제에 정렬이 지정되어 있으면 `ORDER BY`도 작성하세요.
 
 ## 4. 요구사항
 
-화면의 **기대 결과 보기**에서도 반환 열과 모든 결과 행을 확인할 수 있습니다. 결과가 같더라도 조건을 어떻게 작성했는지 한 문장으로 설명해 보세요. 결과 비교는 이번 연습 데이터에 대한 확인이며, 어떤 데이터에도 맞는 SQL임을 증명하는 검사는 아닙니다.
+화면의 **기대 결과 보기**에서도 반환 열과 모든 결과 행을 확인할 수 있습니다. 결과가 같더라도 조건을 어떻게 작성했는지 한 문장으로 설명해 보세요. 
+결과 비교는 이번 연습 데이터에 대한 확인이며, 어떤 데이터에도 맞는 SQL임을 증명하는 검사는 아닙니다.
 
 먼저 B1~B16을 순서대로 풀며 `SELECT`, `FROM`, `AS`, 문자열, `ORDER BY`, `DISTINCT`, `WHERE`, `AND`, `OR`, `IN`, `BETWEEN`, `LIKE`, `IS NULL`, `IS NOT NULL`, `LIMIT`를 한 가지씩 연습합니다. 정렬을 요구하지 않는 문제는 결과 행의 순서와 관계없이 채점합니다.
 
@@ -243,7 +260,8 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 - 조회 결과에 currency 열을 추가하고, 모든 행에 문자열 'KRW'를 표시하세요. currency는 원본 테이블에 없는 결과용 열입니다.
 - product_id 오름차순으로 정렬한다.
 
-완료 확인: `product_id`, `product_name`, `original_price`, `sale_price`, `currency` 열을 순서대로 반환하고, 기대 결과 20행과 값·순서가 일치합니다.
+완료 확인: `product_id`, `product_name`, `original_price`, `sale_price`, `currency` 열을 순서대로 반환하고, 
+기대 결과 20행과 값·순서가 일치합니다.
 
 <details>
 <summary>키워드 힌트</summary>
