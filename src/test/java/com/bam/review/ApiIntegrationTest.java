@@ -1,5 +1,6 @@
 package com.bam.review;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -19,6 +20,17 @@ import org.springframework.test.web.servlet.MockMvc;
 class ApiIntegrationTest {
     @Autowired
     MockMvc mockMvc;
+
+    @Test
+    void servesUnifiedSqlWorkspaceAndSourceTableDialog() throws Exception {
+        mockMvc.perform(get("/").header(HttpHeaders.HOST, "localhost:8094"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("id=\"topic-title\"")))
+                .andExpect(content().string(containsString("id=\"schema\"")))
+                .andExpect(content().string(containsString("id=\"sql\"")))
+                .andExpect(content().string(containsString("id=\"after-run\"")))
+                .andExpect(content().string(containsString("id=\"source-dialog\"")));
+    }
 
     @Test
     void returnsRootCatalogForAllowedLoopbackHost() throws Exception {

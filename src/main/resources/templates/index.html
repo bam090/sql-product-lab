@@ -18,28 +18,91 @@
       <p class="sidebar-note">IntelliJ에서는 <code>sql/문제번호.sql</code>을 수정하세요. 웹에서 저장한 내용도 같은 파일에 반영됩니다.</p>
     </aside>
     <main>
-      <section class="card task">
-        <div class="section-heading"><p class="eyebrow" id="step">연습 준비</p><span id="minutes" class="pill"></span></div>
-        <h2 id="title">문제를 불러오고 있어요</h2>
-        <ul id="requirements"></ul>
-        <details><summary>테이블과 컬럼 확인</summary><p><code>practice.products</code> · 연습용 상품 20개</p><div class="table-scroll"><table><thead><tr><th>컬럼명</th><th>타입</th><th>뜻</th></tr></thead><tbody id="schema"></tbody></table></div></details>
-        <details><summary>힌트 보기</summary><p id="hints"></p></details>
-        <details><summary>기대 결과 보기</summary><p class="muted">정답 SQL 대신, 만들어야 할 결과를 확인해 보세요.</p><div id="expected" class="table-scroll"></div></details>
+      <section class="card lab-card" aria-labelledby="topic-title">
+        <header class="topic-header">
+          <div>
+            <p class="eyebrow" id="step">연습 준비</p>
+            <h2 id="topic-title">상품 조회 SQL 연습</h2>
+          </div>
+          <span id="minutes" class="pill"></span>
+        </header>
+        <div class="lab-grid">
+          <section class="schema-panel" aria-labelledby="schema-title">
+            <div class="panel-heading">
+              <div>
+                <p class="panel-label">테이블 확인</p>
+                <h3 id="schema-title"><code>practice.products</code></h3>
+              </div>
+              <span id="schema-count" class="muted"></span>
+            </div>
+            <p id="schema-description" class="muted"></p>
+            <div class="table-scroll schema-table">
+              <table>
+                <thead><tr><th>컬럼명</th><th>타입</th><th>뜻</th></tr></thead>
+                <tbody id="schema"></tbody>
+              </table>
+            </div>
+            <button id="open-source" class="secondary source-button" type="button" disabled>원본 테이블 보기</button>
+          </section>
+          <div class="work-panel">
+            <section class="problem-panel" aria-labelledby="title">
+              <p class="panel-label">문제</p>
+              <h3 id="title">문제를 불러오고 있어요</h3>
+              <ul id="requirements"></ul>
+            </section>
+            <section class="editor-panel" aria-labelledby="editor-title">
+              <div class="section-heading">
+                <h3 id="editor-title">쿼리 작성</h3>
+                <code id="filename"></code>
+              </div>
+              <textarea id="sql" spellcheck="false" autocapitalize="off" aria-describedby="editor-help" placeholder="SELECT ..."></textarea>
+              <div class="editor-footer">
+                <span id="editor-help" class="muted">⌘ / Ctrl + Enter로 실행 · 파일 저장은 별도</span>
+                <div class="actions">
+                  <button id="reload" class="secondary" type="button">파일 다시 읽기</button>
+                  <button id="save" class="secondary" type="button">파일에 저장</button>
+                  <button id="run" class="primary" type="button">실행하기 <span aria-hidden="true">→</span></button>
+                </div>
+              </div>
+              <p id="save-status" role="status" class="muted small"></p>
+            </section>
+          </div>
+        </div>
       </section>
-      <section class="card editor-card">
-        <div class="section-heading"><label for="sql">내 SQL</label><code id="filename"></code></div>
-        <textarea id="sql" spellcheck="false" autocapitalize="off" aria-describedby="editor-help" placeholder="SELECT ..."></textarea>
-        <div class="actions"><span id="editor-help" class="muted">⌘ / Ctrl + Enter로 실행 · 파일 저장은 별도</span><button id="reload" class="secondary">파일 다시 읽기</button><button id="save" class="secondary">파일에 저장</button><button id="run" class="primary">실행하기 <span aria-hidden="true">→</span></button></div>
-        <p id="save-status" role="status" class="muted small"></p>
-      </section>
-      <section class="card result-card" aria-live="polite">
-        <div class="section-heading"><h2>조회 결과</h2><span id="result-meta" class="muted"></span></div>
+      <section class="card result-card" aria-labelledby="result-title" aria-live="polite">
+        <div class="section-heading">
+          <h2 id="result-title">실행 결과와 풀이</h2>
+          <span id="result-meta" class="muted"></span>
+        </div>
         <p id="error" role="alert" hidden></p>
         <div id="result" class="table-scroll"><p class="empty">SQL을 실행하면 실제 데이터베이스의 결과가 여기에 표시됩니다.</p></div>
-        <p id="comparison" class="comparison"></p>
+        <div id="after-run" class="after-run" hidden>
+          <p id="comparison" class="comparison"></p>
+          <div class="solution-heading">
+            <h3>풀이 확인</h3>
+            <p class="muted">정답 SQL을 보여주지 않고, 힌트와 기대 결과로 직접 점검할 수 있어요.</p>
+          </div>
+          <details><summary>힌트 보기</summary><p id="hints"></p></details>
+          <details><summary>기대 결과 보기</summary><p class="muted">만들어야 할 열과 행을 현재 실행 결과와 비교해 보세요.</p><div id="expected" class="table-scroll"></div></details>
+        </div>
       </section>
       <footer>Supabase PostgreSQL · 조회 전용 실습 · <a href="https://www.postgresql.org/docs/current/sql-select.html" target="_blank" rel="noreferrer">SELECT 공식 문서 ↗</a></footer>
     </main>
   </div>
+  <dialog id="source-dialog" aria-labelledby="source-dialog-title">
+    <div class="dialog-shell">
+      <header class="dialog-heading">
+        <div>
+          <p class="panel-label">실제 데이터베이스</p>
+          <h2 id="source-dialog-title">원본 테이블 · <code>practice.products</code></h2>
+        </div>
+        <button id="close-source" class="dialog-close" type="button" aria-label="원본 테이블 닫기">×</button>
+      </header>
+      <p class="muted">연습에 사용하는 상품 데이터를 <code>product_id</code> 순서로 보여줍니다.</p>
+      <p id="source-status" class="muted" role="status"></p>
+      <p id="source-error" role="alert" hidden></p>
+      <div id="source-result" class="table-scroll source-result"></div>
+    </div>
+  </dialog>
 </body>
 </html>
