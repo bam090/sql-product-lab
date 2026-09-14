@@ -1,7 +1,7 @@
 (function (root) {
   const KEYWORDS = [
     'SELECT', 'FROM', 'AS', 'DISTINCT', 'WHERE', 'AND', 'OR', 'IN', 'LIKE',
-    'LOWER', 'TRIM', 'IS', 'NOT', 'NULL', 'BETWEEN', 'ORDER', 'BY', 'ASC',
+    'LOWER', 'TRIM', 'IS', 'NOT', 'NULL', 'BETWEEN', 'ORDER BY', 'BY', 'ASC',
     'DESC', 'ROUND', 'LIMIT'
   ];
 

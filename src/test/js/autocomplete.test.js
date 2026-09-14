@@ -64,8 +64,15 @@ test('does not suggest inside SQL strings, quoted identifiers, or comments', () 
   assert.deepEqual(markedCompletion('-- comment\nSEL|').items.map((item) => item.value), ['SELECT']);
 });
 
-test('keeps the candidate set to tokens rather than answers or conditions', () => {
-  assert.equal(candidates.some((candidate) => /\s/.test(candidate.value)), false);
+test('completes ORDER BY as one phrase without adding an answer or condition', () => {
+  for (const prefix of ['ord', 'ORDER']) {
+    const sql = `SELECT * FROM practice.products ${prefix}`;
+    const match = autocomplete.completions(sql, sql.length, candidates);
+    assert.deepEqual(match.items.map((item) => item.value), ['ORDER BY']);
+    assert.equal(autocomplete.applyCompletion(sql, match.range, match.items[0].value).text,
+      'SELECT * FROM practice.products ORDER BY');
+  }
+  assert.deepEqual(candidates.filter((candidate) => /\s/.test(candidate.value)).map((item) => item.value), ['ORDER BY']);
   assert.equal(candidates.some((candidate) => candidate.value.includes('=')), false);
   assert.equal(markedCompletion('SELECT|'), null);
 });
