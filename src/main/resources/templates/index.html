@@ -6,6 +6,7 @@
   <title>작은 상점 · SQL 실험실</title>
   <link rel="stylesheet" href="/style.css">
   <script src="/autocomplete.js" defer></script>
+  <script src="/result-comparison.js" defer></script>
   <script src="/lab.js" defer></script>
 </head>
 <body>
@@ -72,6 +73,7 @@
               <p class="panel-label">문제</p>
               <h3 id="title">문제를 불러오고 있어요</h3>
               <ul id="requirements"></ul>
+              <p id="syntax-frame" class="muted" hidden></p>
             </section>
             <section class="editor-panel" aria-labelledby="editor-title">
               <div class="section-heading">
@@ -83,7 +85,7 @@
                 <div id="sql-suggestions" class="autocomplete-list" role="listbox" aria-label="SQL 자동완성 후보" hidden></div>
               </div>
               <div class="editor-footer">
-                <span id="editor-help" class="muted">자동완성: ↑↓ 선택 · Tab 확정 · Esc 닫기 · ⌘ / Ctrl + Enter 실행</span>
+                <span id="editor-help" class="muted">자동완성: ↑↓ 선택 · Tab 확정 · Esc 닫기 · Tab/Shift+Tab 들여쓰기 · Esc 뒤 Tab 다음 버튼 · ⌘ / Ctrl + Enter 실행</span>
                 <div class="actions">
                   <button id="reload" class="secondary" type="button">파일 다시 읽기</button>
                   <button id="save" class="secondary" type="button">파일에 저장</button>

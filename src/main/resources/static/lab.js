@@ -1,10 +1,11 @@
 const $ = (id) => document.getElementById(id);
 let catalog, current, dirty = false, busy = false, selectionRevision = 0;
 let sourceDialogTrigger = null, sourceRevision = 0;
-let autocompleteCandidates = [], autocompleteMatch = null, autocompleteIndex = 0, composing = false;
+let autocompleteCandidates = [], autocompleteMatch = null, autocompleteIndex = 0, composing = false, tabMovesFocus = false;
 const drafts = new Map();
 const SOURCE_TABLE_SQL = 'SELECT * FROM practice.products ORDER BY product_id';
 const BRANCH_LABELS = {
+  'warmup': '00 한 단계씩 SQL 시작하기',
   'codex/select': '01 열 선택과 결과 가공',
   'codex/filters': '02 조건으로 상품 찾기',
   'codex/integration': '03 종합 조회'
@@ -35,6 +36,40 @@ function table(target, columns, rows) {
   t.append(body); target.append(t);
 }
 function error(message) { $('error').hidden = !message; $('error').textContent = message; }
+function adjustIndent(text, start, end, outdent) {
+  if (start === end && !outdent) {
+    const inserted = '    ';
+    return { text: text.slice(0, start) + inserted + text.slice(end), start: start + inserted.length, end: start + inserted.length };
+  }
+  const firstLineStart = text.lastIndexOf('\n', start - 1) + 1;
+  const selectedEnd = end > start && text[end - 1] === '\n' ? end - 1 : end;
+  const lastLineEnd = text.indexOf('\n', selectedEnd);
+  const blockEnd = lastLineEnd === -1 ? text.length : lastLineEnd;
+  const lines = text.slice(firstLineStart, blockEnd).split('\n');
+  let offset = firstLineStart, removedBeforeStart = 0, removedBeforeEnd = 0;
+  const adjusted = lines.map((line) => {
+    if (!outdent) { offset += line.length + 1; return `    ${line}`; }
+    const removed = Math.min(4, (line.match(/^ */) || [''])[0].length);
+    if (offset < start) removedBeforeStart += Math.min(removed, start - offset);
+    if (offset < end) removedBeforeEnd += Math.min(removed, end - offset);
+    offset += line.length + 1;
+    return line.slice(removed);
+  });
+  const changed = adjusted.join('\n');
+  return {
+    text: text.slice(0, firstLineStart) + changed + text.slice(blockEnd),
+    start: outdent ? start - removedBeforeStart : start + 4,
+    end: outdent ? end - removedBeforeEnd : end + lines.length * 4
+  };
+}
+function indentEditor(outdent) {
+  const editor = $('sql');
+  const adjusted = adjustIndent(editor.value, editor.selectionStart, editor.selectionEnd, outdent);
+  if (adjusted.text === editor.value) return;
+  editor.value = adjusted.text;
+  editor.setSelectionRange(adjusted.start, adjusted.end);
+  markSqlDirty();
+}
 function comparison(message, state = '') {
   const target = $('comparison');
   target.hidden = !message;
@@ -115,6 +150,8 @@ async function select(exercise) {
   $('minutes').textContent = `약 ${exercise.minutes}분`;
   $('filename').textContent = `sql/${exercise.id}.sql`;
   $('requirements').replaceChildren(...exercise.requirements.map((r) => cell('li', r)));
+  $('syntax-frame').hidden = !exercise.syntaxFrame;
+  $('syntax-frame').textContent = exercise.syntaxFrame ? `문법 틀: ${exercise.syntaxFrame}` : '';
   $('hints').textContent = exercise.hints.join(' · ');
   table($('expected'), exercise.columns, exercise.expectedRows);
   document.querySelectorAll('.exercise').forEach((b) => { b.classList.toggle('active', b.dataset.id === exercise.id); b.setAttribute('aria-current', b.dataset.id === exercise.id ? 'step' : 'false'); });
@@ -158,21 +195,28 @@ async function run() {
     const result = await api('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exerciseId: current.id, sql: $('sql').value }) });
     table($('result'), result.columns, result.rows);
     $('result-meta').textContent = `${result.rowCount}행 · ${result.elapsedMs}ms${result.truncated ? ' · 최대 200행만 표시' : ''}`;
-    const normalize = (rows) => rows.map((r) => r.map((v) => v === null ? null : String(v)));
-    const same = JSON.stringify(result.columns) === JSON.stringify(current.columns) && JSON.stringify(normalize(result.rows)) === JSON.stringify(normalize(current.expectedRows));
-    comparison(same ? '정답이에요 · 기대 결과와 같아요' : '아직 정답이 아니에요 · 반환 열·값·정렬 순서를 확인해 보세요.', same ? '' : 'mismatch');
+    const same = SqlResultComparison.matches(result, current);
+    const retry = current.orderMatters === false ? '반환 열과 값을 확인해 보세요.' : '반환 열·값·정렬 순서를 확인해 보세요.';
+    comparison(same ? '정답이에요 · 기대 결과와 같아요' : `아직 정답이 아니에요 · ${retry}`, same ? '' : 'mismatch');
   } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(); $('result-meta').textContent = ''; }
   finally { busy = false; $('run').disabled = false; $('run').textContent = '실행하기 →'; }
 }
 $('run').addEventListener('click', run);
 $('sql').addEventListener('keydown', (e) => {
-  if (e.isComposing || composing) return;
+  if (e.isComposing || composing || $('sql').readOnly) return;
+  if (e.key !== 'Escape' && e.key !== 'Tab') tabMovesFocus = false;
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); closeAutocomplete(); run(); return; }
+  if (e.key === 'Escape') { closeAutocomplete(); tabMovesFocus = true; return; }
+  if (e.key === 'Tab') {
+    if (autocompleteMatch) { e.preventDefault(); acceptAutocomplete(autocompleteIndex); return; }
+    if (tabMovesFocus) { tabMovesFocus = false; return; }
+    e.preventDefault();
+    indentEditor(e.shiftKey);
+    return;
+  }
   if (!autocompleteMatch) return;
   if (e.key === 'ArrowDown') { e.preventDefault(); selectAutocomplete(autocompleteIndex + 1); }
   else if (e.key === 'ArrowUp') { e.preventDefault(); selectAutocomplete(autocompleteIndex - 1); }
-  else if (e.key === 'Tab') { e.preventDefault(); acceptAutocomplete(autocompleteIndex); }
-  else if (e.key === 'Escape') { e.preventDefault(); closeAutocomplete(); }
   else if (e.key === 'Enter') closeAutocomplete();
 });
 $('sql').addEventListener('keyup', (e) => {
@@ -233,7 +277,7 @@ async function init() {
     $('schema-count').textContent = `${catalog.schema.seedRowCount}행`;
     catalog.schema.columns.forEach((c) => { const tr = document.createElement('tr'); [c.name,c.type,c.description].forEach((v) => tr.append(cell('td',v))); $('schema').append(tr); });
     let previous = '';
-    const order = ['codex/select', 'codex/filters', 'codex/integration'];
+    const order = ['warmup', 'codex/select', 'codex/filters', 'codex/integration'];
     [...catalog.exercises].sort((a, b) => order.indexOf(a.branch) - order.indexOf(b.branch)).forEach((e) => {
       if (e.branch !== previous) { const p = cell('p', BRANCH_LABELS[e.branch] || e.branch); p.className = 'group-label'; $('exercises').append(p); previous = e.branch; }
       const b = document.createElement('button'); b.className = 'exercise'; b.dataset.id = e.id; b.append(cell('span', e.id), document.createTextNode(e.title)); b.addEventListener('click', () => select(e)); $('exercises').append(b);

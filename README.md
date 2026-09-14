@@ -2,17 +2,15 @@
 
 ## 1. 이번 연습
 
-**오늘 배운 SQL로 상품을 조회하고 결과를 가공하는 연습입니다. 직접 작성할 코드는 `sql/` 안의 SELECT 문뿐입니다.**
+**아주 쉬운 한 줄 조회부터 시작해, 오늘 배운 SQL로 상품을 찾고 결과를 가공하는 연습입니다. 직접 작성할 코드는 `sql/` 안의 SELECT 문뿐입니다.**
 
-- 핵심: SELECT · FROM · AS · 계산식 · DISTINCT · WHERE · AND/OR · IN/LIKE · NULL · 날짜 범위
-- 예상 시간: 핵심 약 43분, 선택 약 10분. 한 번에 끝내지 않아도 됩니다.
+- 핵심: SELECT · FROM · AS · 문자열 · ORDER BY · 계산식 · DISTINCT · WHERE · AND/OR · IN/LIKE · NULL · 날짜 범위
+- 예상 시간: 워밍업을 포함한 핵심 약 58분, 선택 약 10분. 한 번에 끝내지 않아도 됩니다.
 - 데이터: 연습용 상품 20개. `practice.products` 테이블 하나를 사용합니다.
 - 미리 구현한 부분: 화면, SQL 파일 읽기·저장, 쿼리 실행, 결과 표, 오류 표시, 기대 결과 비교.
 - 정답 SQL은 이 프로젝트에 포함하지 않았습니다.
 
-**현재 브랜치: `codex/select` · 열 선택과 결과 가공**
-
-이번 브랜치에서는 S1~S3을 풉니다. WHERE 조건은 다음 연습에서 다룹니다.
+화면 하나에서 **워밍업 → 기본 조회 → 조건 조회 → 종합 조회** 순서로 모든 문제를 풀 수 있습니다. 처음에는 B1을 선택해 SQL 한 문장의 모양부터 익혀 보세요.
 
 ## 2. 실행하기
 
@@ -30,7 +28,7 @@
 
 IntelliJ에서 SQL 파일을 수정했다면 저장 후 화면의 **파일 다시 읽기**를 누르세요. 오류가 나면 입력한 SQL이 유지되고, 같은 화면 아래에 빨간 오류 메시지가 표시됩니다. `⌘ + Enter` 또는 `Ctrl + Enter`로도 실행할 수 있습니다.
 
-SQL 편집기에서 두 글자 이상 입력하면 키워드·테이블·컬럼명 후보가 나타납니다. `↑`·`↓`로 고르고 `Tab`으로 확정하며, `Esc`로 닫을 수 있습니다.
+SQL 편집기에서 두 글자 이상 입력하면 키워드·테이블·컬럼명 후보가 나타납니다. `↑`·`↓`로 고르고 `Tab`으로 확정하며, `Esc`로 닫을 수 있습니다. 후보가 없을 때 `Tab`은 공백 4칸 들여쓰기, `Shift + Tab`은 들여쓰기 줄이기입니다. 여러 줄을 선택해 함께 조절할 수도 있습니다. 편집기 밖으로 이동하려면 `Esc`를 누른 뒤 `Tab`을 누르세요.
 
 > **DB 연결 완료:** 서울 리전의 무료 Supabase 프로젝트 `sql-product-lab`에 연결되어 있습니다. 연습용 상품 20개를 실제로 조회합니다. 연결 설정은 이미 준비했으므로 위 실행 순서대로 시작하세요. 기존 `festival-recommendation` 데이터베이스와는 별개입니다.
 
@@ -45,7 +43,7 @@ SQL 편집기에서 두 글자 이상 입력하면 키워드·테이블·컬럼�
 
 ## 3. 내가 구현할 부분
 
-각 SQL 파일에는 요구사항 주석과 TODO만 있습니다. **SELECT 문 하나**를 작성하세요. 테이블 이름은 `practice.products`로 고정합니다. 반환 열 이름도 아래 요구사항과 맞춰 주세요.
+워밍업 SQL 파일에는 한 줄 개념·문법 틀이 있고, 각 문제 파일에는 요구사항 주석과 TODO가 있습니다. **SELECT 문 하나**를 작성하세요. 테이블 이름은 `practice.products`로 고정합니다. 반환 열 이름도 아래 요구사항과 맞춰 주세요.
 
 | 컬럼 | 타입 | 의미 |
 | --- | --- | --- |
@@ -63,9 +61,59 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 
 화면의 **기대 결과 보기**에서도 반환 열과 모든 결과 행을 확인할 수 있습니다. 결과가 같더라도 조건을 어떻게 작성했는지 한 문장으로 설명해 보세요. 결과 비교는 이번 연습 데이터에 대한 확인이며, 어떤 데이터에도 맞는 SQL임을 증명하는 검사는 아닙니다.
 
+먼저 B1~B6을 순서대로 풀며 `SELECT`, `FROM`, `AS`, 문자열, `ORDER BY`를 한 가지씩 연습합니다. B1~B4는 아직 정렬하지 않으므로 결과 행의 순서와 관계없이 채점합니다.
+
+### B1. 모든 열 조회
+
+작성 파일: [sql/B1.sql](sql/B1.sql) · 약 2분
+
+- 한 줄 개념: `SELECT *`로 테이블의 모든 열을 조회합니다.
+- `practice.products`의 모든 열을 별표(`*`)로 조회합니다.
+- 문법 틀: `SELECT * FROM 테이블명;`
+
+### B2. 열 하나 조회
+
+작성 파일: [sql/B2.sql](sql/B2.sql) · 약 2분
+
+- 한 줄 개념: `SELECT` 뒤에 열 이름을 쓰면 필요한 열만 조회할 수 있습니다.
+- `product_name` 열 하나만 조회합니다.
+- 문법 틀: `SELECT 열이름 FROM 테이블명;`
+
+### B3. 열 여러 개 조회
+
+작성 파일: [sql/B3.sql](sql/B3.sql) · 약 3분
+
+- 한 줄 개념: 여러 열 이름을 쉼표로 구분해 함께 조회합니다.
+- `product_name`, `price` 열을 이 순서로 조회합니다.
+- 문법 틀: `SELECT 열1, 열2 FROM 테이블명;`
+
+### B4. 열 이름에 별칭 붙이기
+
+작성 파일: [sql/B4.sql](sql/B4.sql) · 약 3분
+
+- 한 줄 개념: `AS`로 조회 결과의 열 이름을 바꿉니다.
+- `product_name`을 `name`이라는 열 이름으로 반환합니다.
+- 문법 틀: `SELECT 열이름 AS 새이름 FROM 테이블명;`
+
+### B5. 문자열로 결과 열 만들기
+
+작성 파일: [sql/B5.sql](sql/B5.sql) · 약 2분
+
+- 한 줄 개념: 문자열과 `AS`를 사용해 원본 테이블에 없는 결과용 열을 만듭니다.
+- 문자열 `'KRW'`를 `currency`라는 이름으로 반환하고, `FROM` 없이 한 행을 만듭니다.
+- 문법 틀: `SELECT '문자열' AS 새이름;`
+
+### B6. 열 하나 정렬
+
+작성 파일: [sql/B6.sql](sql/B6.sql) · 약 3분
+
+- 한 줄 개념: `ORDER BY`로 조회 결과를 오름차순 정렬합니다.
+- `product_name` 열만 조회하고 같은 열을 오름차순 정렬합니다.
+- 문법 틀: `SELECT 열이름 FROM 테이블명 ORDER BY 열이름 ASC;`
+
 ### S1. 필요한 상품 열만 조회
 
-작성 파일: [sql/S1.sql](sql/S1.sql) · 약 4분 · `codex/select`
+작성 파일: [sql/S1.sql](sql/S1.sql) · 약 4분
 
 - product_id를 id로 반환한다.
 - product_name을 name으로 반환한다.
@@ -83,7 +131,7 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 
 ### S2. 할인 가격 계산
 
-작성 파일: [sql/S2.sql](sql/S2.sql) · 약 6분 · `codex/select`
+작성 파일: [sql/S2.sql](sql/S2.sql) · 약 6분
 
 - price를 original_price로 반환한다.
 - price의 90%를 소수 둘째 자리까지 반올림해 sale_price로 반환한다.
@@ -101,7 +149,7 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 
 ### S3. 카테고리 중복 제거
 
-작성 파일: [sql/S3.sql](sql/S3.sql) · 약 4분 · `codex/select`
+작성 파일: [sql/S3.sql](sql/S3.sql) · 약 4분
 
 - category의 중복을 제거한다.
 - category 오름차순으로 정렬한다.
@@ -115,35 +163,141 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 
 </details>
 
+### F1. 가격 범위와 재고 조건
 
+작성 파일: [sql/F1.sql](sql/F1.sql) · 약 6분
 
+- 가격이 20 이상 50 이하인 상품을 찾는다.
+- 재고가 1개 이상인 상품만 남긴다.
+- price, product_id 순서로 오름차순 정렬한다.
 
+완료 확인: `product_id`, `product_name`, `price`, `stock_quantity` 열을 순서대로 반환하고, 기대 결과 8행과 값·순서가 일치합니다.
 
+<details>
+<summary>키워드 힌트</summary>
 
+`BETWEEN`, `AND`
 
+</details>
 
-## 5. 브랜치 안내
+### F2. 카테고리와 이름 패턴 검색
 
-하나의 프로젝트에서 브랜치만 바꿔 연습합니다. 브랜치를 바꾸면 **같은 README**의 현재 연습 안내와 화면에 표시되는 문제가 바뀝니다. 표 아래 순서대로 진행하면 됩니다.
+작성 파일: [sql/F2.sql](sql/F2.sql) · 약 5분
 
-| 순서 | 브랜치 | 연습 |
+- Electronics 또는 Books 카테고리만 대상으로 한다.
+- 이름에 SQL이 들어가거나 Wireless로 시작하는 상품을 찾는다.
+- product_id 오름차순으로 정렬한다.
+
+완료 확인: `product_id`, `product_name`, `category` 열을 순서대로 반환하고, 기대 결과 3행과 값·순서가 일치합니다.
+
+<details>
+<summary>키워드 힌트</summary>
+
+`IN`, `LIKE`, `AND`, `OR`, `괄호`
+
+</details>
+
+### F3. NULL과 빈 설명 검색
+
+작성 파일: [sql/F3.sql](sql/F3.sql) · 약 5분
+
+- description이 NULL이거나 TRIM 뒤 빈 문자열인 상품을 찾는다.
+- product_id 오름차순으로 정렬한다.
+
+완료 확인: `product_id`, `product_name`, `description` 열을 순서대로 반환하고, 기대 결과 8행과 값·순서가 일치합니다.
+
+<details>
+<summary>키워드 힌트</summary>
+
+`IS NULL`, `TRIM`, `OR`
+
+</details>
+
+### F4. 9월 출시 범위 검색
+
+작성 파일: [sql/F4.sql](sql/F4.sql) · 약 6분
+
+- 2026-09-01 00:00:00 이상을 포함한다.
+- 2026-10-01 00:00:00 미만만 포함한다.
+- released_at, product_id 순서로 오름차순 정렬한다.
+
+완료 확인: `product_id`, `product_name`, `released_at` 열을 순서대로 반환하고, 기대 결과 13행과 값·순서가 일치합니다.
+
+<details>
+<summary>키워드 힌트</summary>
+
+`>= 시작`, `< 다음 달 시작`
+
+</details>
+
+### I1. 입고 준비 목록 통합 조회
+
+작성 파일: [sql/I1.sql](sql/I1.sql) · 약 7분
+
+- Electronics 또는 Books 카테고리만 대상으로 한다.
+- 재고가 있고 2026년 9월에 출시된 상품만 남긴다.
+- description이 NULL도 빈 문자열도 아닌 상품만 남긴다.
+- product_name을 product로 반환한다.
+- price와 stock_quantity를 곱하고 소수 둘째 자리까지 반올림해 inventory_value로 반환한다.
+- 고정 문자열 ready를 status로 반환한다.
+- product_id 오름차순으로 정렬한다.
+
+완료 확인: `product_id`, `product`, `inventory_value`, `status` 열을 순서대로 반환하고, 기대 결과 3행과 값·순서가 일치합니다.
+
+<details>
+<summary>키워드 힌트</summary>
+
+`IN`, `AND`, `IS NOT NULL`, `TRIM`, `ROUND`, `AS`
+
+</details>
+
+### O1. 대소문자 형태를 맞춘 SQL 검색 · 선택
+
+작성 파일: [sql/O1.sql](sql/O1.sql) · 약 5분
+
+- LOWER로 product_name의 대소문자 형태를 맞춘다.
+- 이름에 sql이 들어간 상품을 찾는다.
+- product_id 오름차순으로 정렬한다.
+
+완료 확인: `product_id`, `product_name` 열을 순서대로 반환하고, 기대 결과 2행과 값·순서가 일치합니다.
+
+<details>
+<summary>키워드 힌트</summary>
+
+`LOWER`, `LIKE`
+
+</details>
+
+### O2. 9월 14일 하루 범위 검색 · 선택
+
+작성 파일: [sql/O2.sql](sql/O2.sql) · 약 5분
+
+- 2026-09-14 00:00:00 이상을 포함한다.
+- 2026-09-15 00:00:00 미만만 포함한다.
+- released_at, product_id 순서로 오름차순 정렬한다.
+
+완료 확인: `product_id`, `product_name`, `released_at` 열을 순서대로 반환하고, 기대 결과 2행과 값·순서가 일치합니다.
+
+<details>
+<summary>키워드 힌트</summary>
+
+`>= 하루 시작`, `< 다음 날 시작`
+
+</details>
+
+## 5. 진행 순서
+
+브랜치를 바꿀 필요 없이 한 화면에서 아래 순서대로 진행합니다.
+
+| 순서 | 문제 | 연습 |
 | --- | --- | --- |
-| 전체 안내 | `codex/start` | 모든 문제 미리 보기 |
-| 1 | `codex/select` | S1~S3: 열 선택·계산·중복 제거 |
-| 2 | `codex/filters` | F1~F4: 조건·NULL·날짜, O1~O2 선택 연습 |
-| 3 | `codex/integration` | I1: 조건과 결과 가공 종합 |
+| 1 | B1~B6 | 워밍업: 전체 열, 열 선택, 별칭, 문자열, 정렬 |
+| 2 | S1~S3 | 기본 조회: 열 선택, 계산, 중복 제거 |
+| 3 | F1~F4 | 조건 조회: 범위, 패턴, NULL, 날짜 |
+| 4 | I1 | 종합 조회: 조건과 결과 가공 |
+| 선택 | O1~O2 | 대소문자 검색과 하루 날짜 범위 |
 
-처음에는 `codex/select`에서 시작하세요. 한 브랜치의 풀이가 끝나면 IntelliJ의 Commit으로 **SQL 파일을 커밋한 다음** 다음 브랜치로 전환하세요. 저장하지 않은 SQL은 화면 전환 전 파일에 저장해야 합니다. Git이 변경 사항 충돌을 알리면 강제로 버리지 말고 현재 풀이를 먼저 커밋합니다.
-
-```bash
-git switch codex/select
-# 풀이 후 IntelliJ에서 커밋
-git switch codex/filters
-# 풀이 후 IntelliJ에서 커밋
-git switch codex/integration
-```
-
-브랜치를 전환한 뒤 웹 화면을 새로고침하면 새 문제 목록을 불러옵니다. 이전 SQL 풀이 파일은 각 브랜치의 커밋에 남습니다. 서로의 브랜치를 병합할 필요는 없습니다.
+B1부터 한 문제씩 실행하고 기대 결과와 비교하세요. 문제를 옮기기 전에 작성한 SQL을 **파일에 저장**하면 `sql/문제번호.sql`에 풀이가 남습니다.
 
 공식 문서: [PostgreSQL SELECT](https://www.postgresql.org/docs/current/sql-select.html) · [조건식과 NULL](https://www.postgresql.org/docs/current/functions-comparison.html) · [Supabase 연결 방법](https://supabase.com/docs/guides/database/connecting-to-postgres)
 
