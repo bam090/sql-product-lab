@@ -217,7 +217,7 @@ $('sql').addEventListener('keydown', (e) => {
   if (!autocompleteMatch) return;
   if (e.key === 'ArrowDown') { e.preventDefault(); selectAutocomplete(autocompleteIndex + 1); }
   else if (e.key === 'ArrowUp') { e.preventDefault(); selectAutocomplete(autocompleteIndex - 1); }
-  else if (e.key === 'Enter') closeAutocomplete();
+  else if (e.key === 'Enter') { e.preventDefault(); acceptAutocomplete(autocompleteIndex); }
 });
 $('sql').addEventListener('keyup', (e) => {
   if (!composing && !autocompleteMatch && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) refreshAutocomplete();
