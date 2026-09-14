@@ -1,4 +1,4 @@
-name: Deploy SQL lab to Pages
+name: SQL 실험실 Pages 배포
 
 on:
   push:
@@ -38,6 +38,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy
+      - name: Pages에 배포
         id: deployment
         uses: actions/deploy-pages@v4
