@@ -20,7 +20,11 @@ h3 { margin: 0; font-size: 17px; letter-spacing: -.35px; }
 .muted { color: var(--muted); font-size: 13px; }
 .small { font-size: 12px; min-height: 19px; margin-bottom: 0; }
 nav { margin-top: 30px; }
-.group-label { margin: 23px 0 7px; font-size: 11px; font-weight: 800; color: var(--muted); }
+.exercise-group { margin-bottom: 6px; padding: 0; border-top: 0; border-bottom: 1px solid var(--line); }
+.group-label { padding: 11px 2px; font-size: 16px; line-height: 1.5; font-weight: 800; color: var(--ink); cursor: pointer; overflow-wrap: anywhere; }
+.group-label::marker { color: #52796f; }
+.group-label:focus-visible { outline: 2px solid #52796f; outline-offset: 2px; border-radius: 4px; }
+.exercise-list { max-height: 210px; overflow-y: auto; margin-bottom: 8px; }
 .exercise { display: flex; align-items: baseline; gap: 12px; width: 100%; background: none; border: 0; border-radius: 7px; padding: 10px 12px; text-align: left; cursor: pointer; color: var(--ink); font-size: 13px; }
 .exercise span { font-size: 11px; opacity: .7; }
 .exercise:hover { background: #e9eee6; }
@@ -120,11 +124,11 @@ dialog::backdrop { background: rgba(31, 45, 48, .46); }
   .layout > aside { position: static; max-height: none; overflow: visible; }
   h1 { font-size: 26px; }
   h1 br { display: none; }
-  nav { margin: 16px 0; display: flex; overflow-x: auto; gap: 6px; }
-  .group-label, .sidebar-note { display: none; }
+  nav { margin: 16px 0; }
+  .sidebar-note { display: none; }
   .sql-reference { margin: 20px 0 26px; }
   .sql-reference-scroll { max-height: 230px; }
-  .exercise { min-width: 180px; border: 1px solid var(--line); }
+  .exercise { min-width: 0; border: 1px solid var(--line); }
   .card { border-radius: 12px; }
   .topic-header, .schema-panel, .problem-panel, .editor-panel { padding-left: 17px; padding-right: 17px; }
   .topic-header { min-height: 94px; }

@@ -276,11 +276,25 @@ async function init() {
     $('schema-description').textContent = catalog.schema.description;
     $('schema-count').textContent = `${catalog.schema.seedRowCount}행`;
     catalog.schema.columns.forEach((c) => { const tr = document.createElement('tr'); [c.name,c.type,c.description].forEach((v) => tr.append(cell('td',v))); $('schema').append(tr); });
-    let previous = '';
+    let previous = '', groupList;
     const order = ['warmup', 'codex/select', 'codex/filters', 'codex/integration'];
     [...catalog.exercises].sort((a, b) => order.indexOf(a.branch) - order.indexOf(b.branch)).forEach((e) => {
-      if (e.branch !== previous) { const p = cell('p', BRANCH_LABELS[e.branch] || e.branch); p.className = 'group-label'; $('exercises').append(p); previous = e.branch; }
-      const b = document.createElement('button'); b.className = 'exercise'; b.dataset.id = e.id; b.append(cell('span', e.id), document.createTextNode(e.title)); b.addEventListener('click', () => select(e)); $('exercises').append(b);
+      if (e.branch !== previous) {
+        const group = document.createElement('details');
+        group.className = 'exercise-group';
+        group.open = e.branch === catalog.exercises[0].branch;
+        const summary = cell('summary', BRANCH_LABELS[e.branch] || e.branch);
+        summary.className = 'group-label';
+        groupList = document.createElement('div');
+        groupList.className = 'exercise-list';
+        group.append(summary, groupList);
+        group.addEventListener('toggle', () => {
+          if (group.open) document.querySelectorAll('.exercise-group').forEach((other) => { if (other !== group) other.open = false; });
+        });
+        $('exercises').append(group);
+        previous = e.branch;
+      }
+      const b = document.createElement('button'); b.className = 'exercise'; b.dataset.id = e.id; b.append(cell('span', e.id), document.createTextNode(e.title)); b.addEventListener('click', () => select(e)); groupList.append(b);
     });
     await select(catalog.exercises[0]);
     $('open-source').disabled = false;
