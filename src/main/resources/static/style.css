@@ -35,11 +35,12 @@ nav { margin-top: 30px; }
 .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .panel-label { margin: 0 0 7px; color: #52796f; font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
 .schema-panel > .muted { margin: 12px 0 18px; line-height: 1.55; }
-.schema-table table { table-layout: fixed; margin-top: 0; font-size: 10.5px; line-height: 1.45; }
+.schema-table table { table-layout: fixed; min-width: 410px; margin-top: 0; font-size: 10.5px; line-height: 1.45; }
 .schema-table th:nth-child(1) { width: 34%; }
 .schema-table th:nth-child(2) { width: 31%; }
 .schema-table th:nth-child(3) { width: 35%; }
 .schema-table th, .schema-table td { padding: 8px 7px; vertical-align: top; overflow-wrap: anywhere; }
+.schema-table td:first-child { white-space: nowrap; overflow-wrap: normal; }
 .source-button { width: 100%; margin-top: 20px; }
 .work-panel { min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .problem-panel { min-height: 218px; padding: 25px 28px; border-bottom: 1px solid var(--line); }
