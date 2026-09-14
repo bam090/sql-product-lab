@@ -209,7 +209,7 @@
       "requirements": [
         "price를 original_price로 반환한다.",
         "price의 90%를 소수 둘째 자리까지 반올림해 sale_price로 반환한다.",
-        "고정 문자열 KRW를 currency로 반환한다.",
+        "조회 결과에 currency 열을 추가하고, 모든 행에 문자열 'KRW'를 표시하세요. currency는 원본 테이블에 없는 결과용 열입니다.",
         "product_id 오름차순으로 정렬한다."
       ],
       "columns": [

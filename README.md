@@ -87,7 +87,7 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 
 - price를 original_price로 반환한다.
 - price의 90%를 소수 둘째 자리까지 반올림해 sale_price로 반환한다.
-- 고정 문자열 KRW를 currency로 반환한다.
+- 조회 결과에 currency 열을 추가하고, 모든 행에 문자열 'KRW'를 표시하세요. currency는 원본 테이블에 없는 결과용 열입니다.
 - product_id 오름차순으로 정렬한다.
 
 완료 확인: `product_id`, `product_name`, `original_price`, `sale_price`, `currency` 열을 순서대로 반환하고, 기대 결과 20행과 값·순서가 일치합니다.
