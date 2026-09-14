@@ -30,10 +30,10 @@ nav { margin-top: 30px; }
 .sql-reference h2 { margin: 0 0 10px; font-size: 16px; }
 .sql-reference-scroll { max-height: 250px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
 .sql-reference-scroll:focus-visible { outline: 2px solid #52796f; outline-offset: 3px; }
-.sql-reference table { table-layout: fixed; margin: 0; font-size: 10.5px; line-height: 1.45; }
+.sql-reference table { table-layout: fixed; margin: 0; font-size: 12px; line-height: 1.45; }
 .sql-reference th, .sql-reference td { padding: 7px 8px; vertical-align: top; overflow-wrap: anywhere; }
 .sql-reference th:first-child, .sql-reference td:first-child { width: 55%; }
-.sql-reference td code { white-space: normal; overflow-wrap: anywhere; }
+.sql-reference td code { font-size: 11.5px; white-space: normal; overflow-wrap: anywhere; }
 .card { background: white; border: 1px solid var(--line); border-radius: 16px; padding: 26px; margin-bottom: 22px; }
 .lab-card { padding: 0; overflow: hidden; }
 .topic-header { min-height: 106px; padding: 24px 28px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
