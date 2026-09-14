@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>작은 상점 · SQL 실험실</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/lab.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a href="/" class="brand">작은 상점 <span>SQL 실험실</span></a><span id="connection" class="status">연결 확인 중</span></header>
+  <div class="layout">
+    <aside>
+      <p class="eyebrow">2026.09.14 · SQL 복습</p>
+      <h1>조건을 쓰고,<br>결과를 확인해요.</h1>
+      <p class="muted">상품 20개로 연습하는 조회와 결과 가공.<br>이번에는 SQL만 직접 작성하면 돼요.</p>
+      <nav id="exercises" aria-label="연습 문제"></nav>
+      <p class="sidebar-note">IntelliJ에서는 <code>sql/문제번호.sql</code>을 수정하세요. 웹에서 저장한 내용도 같은 파일에 반영됩니다.</p>
+    </aside>
+    <main>
+      <section class="card task">
+        <div class="section-heading"><p class="eyebrow" id="step">연습 준비</p><span id="minutes" class="pill"></span></div>
+        <h2 id="title">문제를 불러오고 있어요</h2>
+        <ul id="requirements"></ul>
+        <details><summary>테이블과 컬럼 확인</summary><p><code>practice.products</code> · 연습용 상품 20개</p><div class="table-scroll"><table><thead><tr><th>컬럼명</th><th>타입</th><th>뜻</th></tr></thead><tbody id="schema"></tbody></table></div></details>
+        <details><summary>힌트 보기</summary><p id="hints"></p></details>
+        <details><summary>기대 결과 보기</summary><p class="muted">정답 SQL 대신, 만들어야 할 결과를 확인해 보세요.</p><div id="expected" class="table-scroll"></div></details>
+      </section>
+      <section class="card editor-card">
+        <div class="section-heading"><label for="sql">내 SQL</label><code id="filename"></code></div>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" aria-describedby="editor-help" placeholder="SELECT ..."></textarea>
+        <div class="actions"><span id="editor-help" class="muted">⌘ / Ctrl + Enter로 실행 · 파일 저장은 별도</span><button id="reload" class="secondary">파일 다시 읽기</button><button id="save" class="secondary">파일에 저장</button><button id="run" class="primary">실행하기 <span aria-hidden="true">→</span></button></div>
+        <p id="save-status" role="status" class="muted small"></p>
+      </section>
+      <section class="card result-card" aria-live="polite">
+        <div class="section-heading"><h2>조회 결과</h2><span id="result-meta" class="muted"></span></div>
+        <p id="error" role="alert" hidden></p>
+        <div id="result" class="table-scroll"><p class="empty">SQL을 실행하면 실제 데이터베이스의 결과가 여기에 표시됩니다.</p></div>
+        <p id="comparison" class="comparison"></p>
+      </section>
+      <footer>Supabase PostgreSQL · 조회 전용 실습 · <a href="https://www.postgresql.org/docs/current/sql-select.html" target="_blank" rel="noreferrer">SELECT 공식 문서 ↗</a></footer>
+    </main>
+  </div>
+</body>
+</html>

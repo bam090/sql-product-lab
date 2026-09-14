@@ -1,0 +1,12 @@
+-- I1 · 입고 준비 목록 통합 조회
+-- 대상 테이블: practice.products
+-- 반환 열: product_id, product, inventory_value, status
+-- Electronics 또는 Books 카테고리만 대상으로 한다.
+-- 재고가 있고 2026년 9월에 출시된 상품만 남긴다.
+-- description이 NULL도 빈 문자열도 아닌 상품만 남긴다.
+-- product_name을 product로 반환한다.
+-- price와 stock_quantity를 곱하고 소수 둘째 자리까지 반올림해 inventory_value로 반환한다.
+-- 고정 문자열 ready를 status로 반환한다.
+-- product_id 오름차순으로 정렬한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.
