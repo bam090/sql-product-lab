@@ -35,6 +35,12 @@ function table(target, columns, rows) {
   t.append(body); target.append(t);
 }
 function error(message) { $('error').hidden = !message; $('error').textContent = message; }
+function comparison(message, state = '') {
+  const target = $('comparison');
+  target.hidden = !message;
+  target.textContent = message;
+  target.className = `comparison${state ? ` ${state}` : ''}`;
+}
 function markSqlDirty() {
   dirty = true;
   $('save-status').textContent = '저장하지 않은 변경 사항';
@@ -112,7 +118,7 @@ async function select(exercise) {
   $('hints').textContent = exercise.hints.join(' · ');
   table($('expected'), exercise.columns, exercise.expectedRows);
   document.querySelectorAll('.exercise').forEach((b) => { b.classList.toggle('active', b.dataset.id === exercise.id); b.setAttribute('aria-current', b.dataset.id === exercise.id ? 'step' : 'false'); });
-  error(''); $('comparison').textContent = ''; $('result-meta').textContent = '';
+  error(''); comparison(''); $('result-meta').textContent = '';
   $('after-run').hidden = true;
   $('result').replaceChildren(cell('p', 'SQL을 실행하면 실제 조회 결과가 표시됩니다.'));
   await load(false);
@@ -145,7 +151,8 @@ $('save').addEventListener('click', async () => {
 async function run() {
   if (busy || !current || $('sql').readOnly) return;
   closeAutocomplete();
-  busy = true; $('run').disabled = true; $('run').textContent = '실행 중…'; error(''); $('comparison').textContent = '';
+  busy = true; $('run').disabled = true; $('run').textContent = '실행 중…'; error(''); comparison('실행 결과를 확인하고 있어요…', 'loading');
+  $('result-meta').textContent = ''; $('result').replaceChildren(cell('p', 'SQL을 실행하고 있어요…'));
   $('after-run').hidden = false;
   try {
     const result = await api('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exerciseId: current.id, sql: $('sql').value }) });
@@ -153,9 +160,8 @@ async function run() {
     $('result-meta').textContent = `${result.rowCount}행 · ${result.elapsedMs}ms${result.truncated ? ' · 최대 200행만 표시' : ''}`;
     const normalize = (rows) => rows.map((r) => r.map((v) => v === null ? null : String(v)));
     const same = JSON.stringify(result.columns) === JSON.stringify(current.columns) && JSON.stringify(normalize(result.rows)) === JSON.stringify(normalize(current.expectedRows));
-    $('comparison').textContent = same ? '기대 결과와 같아요. SQL이 요구사항을 어떻게 반영했는지도 설명해 보세요.' : '기대 결과와 달라요. 반환 열 이름, 조건, 정렬 순서를 확인해 보세요.';
-    $('comparison').className = `comparison${same ? '' : ' mismatch'}`;
-  } catch (e) { error(e.message); $('result').replaceChildren(); $('result-meta').textContent = ''; }
+    comparison(same ? '정답이에요 · 기대 결과와 같아요' : '아직 정답이 아니에요 · 반환 열·값·정렬 순서를 확인해 보세요.', same ? '' : 'mismatch');
+  } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(); $('result-meta').textContent = ''; }
   finally { busy = false; $('run').disabled = false; $('run').textContent = '실행하기 →'; }
 }
 $('run').addEventListener('click', run);

@@ -90,8 +90,9 @@ td { max-width: 280px; overflow-wrap: anywhere; }
 #error, #source-error { color: var(--error); background: #fff1ef; padding: 15px; border-left: 3px solid var(--error); border-radius: 4px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
 .result-card { min-height: 190px; }
 .after-run { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 5px; }
-.comparison { color: #52796f; font-size: 13px; margin: 12px 0 20px; }
-.comparison.mismatch { color: #8a6019; }
+.comparison { margin: 12px 0 16px; border-left: 3px solid #52796f; border-radius: 4px; padding: 9px 12px; color: #52796f; background: #edf1e9; font-size: 13px; font-weight: 650; }
+.comparison.loading { border-color: var(--line); color: var(--muted); background: #f7f8f5; font-weight: 500; }
+.comparison.mismatch { border-color: #8a6019; color: #8a6019; background: #fff8e7; }
 .solution-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; margin: 9px 0 12px; }
 .solution-heading p { margin: 0; text-align: right; }
 footer { color: var(--muted); font-size: 11px; text-align: center; padding: 8px 0 20px; }
