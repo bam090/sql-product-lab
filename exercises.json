@@ -14,13 +14,15 @@
       "AND",
       "OR",
       "IN",
+      "BETWEEN",
       "LIKE",
       "LOWER",
       "TRIM",
       "IS NULL",
       "IS NOT NULL",
       "반개방 날짜 범위",
-      "ORDER BY"
+      "ORDER BY",
+      "LIMIT"
     ]
   },
   "schema": {
@@ -67,7 +69,7 @@
     ]
   },
   "timing": {
-    "coreMinutes": 58,
+    "coreMinutes": 78,
     "optionalMinutes": 10
   },
   "postgresExecution": {
@@ -337,6 +339,327 @@
       "optional": false,
       "sortRequired": true,
       "schemaNote": "정렬에 사용하는 product_name 열만 반환하므로 결과 순서를 바로 확인할 수 있습니다."
+    },
+    {
+      "id": "B7",
+      "title": "중복 카테고리 제거",
+      "branch": "warmup",
+      "concept": "DISTINCT로 같은 값을 한 번씩만 조회합니다.",
+      "syntaxFrame": "SELECT DISTINCT 열이름 FROM 테이블명;",
+      "requirements": [
+        "practice.products의 category를 조회한다.",
+        "DISTINCT로 중복 카테고리를 제거한다."
+      ],
+      "columns": [
+        "category"
+      ],
+      "expectedRows": [
+        ["Electronics"],
+        ["Apparel"],
+        ["Home"],
+        ["Books"],
+        ["Food"],
+        ["Sports"],
+        ["Other"]
+      ],
+      "hints": [
+        "DISTINCT"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "여러 상품이 같은 category를 공유합니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B8",
+      "title": "조건 하나로 품절 찾기",
+      "branch": "warmup",
+      "concept": "WHERE로 조건에 맞는 행만 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 열이름 = 값;",
+      "requirements": [
+        "product_id, product_name, stock_quantity를 조회한다.",
+        "WHERE로 stock_quantity가 0인 상품만 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "stock_quantity"
+      ],
+      "expectedRows": [
+        [3, "USB-C Hub", 0],
+        [7, "Running Socks", 0],
+        [13, "Spring Boot Intro", 0],
+        [18, "Steel Bottle", 0]
+      ],
+      "hints": [
+        "WHERE",
+        "="
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "stock_quantity 0은 품절을 뜻합니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B9",
+      "title": "두 조건 모두 만족하기",
+      "branch": "warmup",
+      "concept": "AND로 두 조건을 모두 만족하는 행을 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 조건1 AND 조건2;",
+      "requirements": [
+        "product_id, product_name, category, stock_quantity를 조회한다.",
+        "AND로 category가 Electronics이고 stock_quantity가 0보다 큰 상품을 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "category",
+        "stock_quantity"
+      ],
+      "expectedRows": [
+        [1, "Wireless Mouse", "Electronics", 15],
+        [2, "Mechanical Keyboard", "Electronics", 8],
+        [4, "Noise-Canceling Headphones", "Electronics", 5]
+      ],
+      "hints": [
+        "AND"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "문자열 Electronics는 작은따옴표로 감쌉니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B10",
+      "title": "두 조건 중 하나 만족하기",
+      "branch": "warmup",
+      "concept": "OR로 두 조건 중 하나라도 만족하는 행을 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 조건1 OR 조건2;",
+      "requirements": [
+        "product_id, product_name, category를 조회한다.",
+        "OR로 category가 Books이거나 Sports인 상품을 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "category"
+      ],
+      "expectedRows": [
+        [11, "SQL Basics", "Books"],
+        [12, "PostgreSQL Practice", "Books"],
+        [13, "Spring Boot Intro", "Books"],
+        [17, "Yoga Mat", "Sports"],
+        [18, "Steel Bottle", "Sports"],
+        [19, "Trail Backpack", "Sports"]
+      ],
+      "hints": [
+        "OR"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "Books와 Sports는 category의 실제 값입니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B11",
+      "title": "목록에 있는 값 찾기",
+      "branch": "warmup",
+      "concept": "IN으로 목록에 포함된 값을 간단히 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 열이름 IN ('값1', '값2');",
+      "requirements": [
+        "product_id, product_name, category를 조회한다.",
+        "IN으로 category가 Apparel 또는 Home인 상품을 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "category"
+      ],
+      "expectedRows": [
+        [5, "Cotton T-Shirt", "Apparel"],
+        [6, "Linen Shirt", "Apparel"],
+        [7, "Running Socks", "Apparel"],
+        [8, "Desk Lamp", "Home"],
+        [9, "Ceramic Mug", "Home"],
+        [10, "Storage Basket", "Home"]
+      ],
+      "hints": [
+        "IN"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "Apparel과 Home을 IN 괄호 안에 나열합니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B12",
+      "title": "양끝을 포함한 가격 범위",
+      "branch": "warmup",
+      "concept": "BETWEEN은 시작값과 끝값을 모두 포함해 범위를 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 열이름 BETWEEN 시작값 AND 끝값;",
+      "requirements": [
+        "product_id, product_name, price를 조회한다.",
+        "BETWEEN으로 price가 15 이상 22 이하인 상품을 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "price"
+      ],
+      "expectedRows": [
+        [5, "Cotton T-Shirt", 19.9],
+        [9, "Ceramic Mug", 15.0],
+        [10, "Storage Basket", 22.0],
+        [16, "Coffee Beans", 18.0]
+      ],
+      "hints": [
+        "BETWEEN",
+        "AND"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "BETWEEN은 양끝을 포함하므로 price 15.00과 22.00도 결과에 들어갑니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B13",
+      "title": "대문자 S로 시작하는 이름",
+      "branch": "warmup",
+      "concept": "LIKE와 %로 특정 글자로 시작하는 문자열을 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 열이름 LIKE '접두어%';",
+      "requirements": [
+        "product_id와 product_name을 조회한다.",
+        "LIKE로 product_name이 대문자 S로 시작하는 상품을 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name"
+      ],
+      "expectedRows": [
+        [10, "Storage Basket"],
+        [11, "SQL Basics"],
+        [13, "Spring Boot Intro"],
+        [18, "Steel Bottle"]
+      ],
+      "hints": [
+        "LIKE",
+        "%"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "실제 상품명에 있는 대문자 S 접두어를 사용합니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B14",
+      "title": "설명이 없는 NULL 찾기",
+      "branch": "warmup",
+      "concept": "IS NULL로 값이 NULL인 행을 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 열이름 IS NULL;",
+      "requirements": [
+        "product_id, product_name, description을 조회한다.",
+        "IS NULL로 description이 NULL인 상품만 찾는다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "description"
+      ],
+      "expectedRows": [
+        [2, "Mechanical Keyboard", null],
+        [6, "Linen Shirt", null],
+        [9, "Ceramic Mug", null],
+        [15, "Dark Chocolate", null]
+      ],
+      "hints": [
+        "IS NULL"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "NULL은 값이 없다는 뜻이며 빈 문자열과 다릅니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B15",
+      "title": "NULL이 아닌 설명 찾기",
+      "branch": "warmup",
+      "concept": "IS NOT NULL로 NULL이 아닌 행을 조회합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 WHERE 열이름 IS NOT NULL;",
+      "requirements": [
+        "product_id, product_name, description을 조회한다.",
+        "IS NOT NULL로 description이 NULL이 아닌 상품을 찾는다. 빈 문자열도 결과에 포함한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "description"
+      ],
+      "expectedRows": [
+        [1, "Wireless Mouse", "Compact wireless mouse"],
+        [3, "USB-C Hub", ""],
+        [4, "Noise-Canceling Headphones", "Over-ear design"],
+        [5, "Cotton T-Shirt", "  Basic fit  "],
+        [7, "Running Socks", ""],
+        [8, "Desk Lamp", "Warm light"],
+        [10, "Storage Basket", "Woven basket"],
+        [11, "SQL Basics", "Beginner SQL guide"],
+        [12, "PostgreSQL Practice", "Hands-on workbook"],
+        [13, "Spring Boot Intro", ""],
+        [14, "Oat Granola", "No added sugar"],
+        [16, "Coffee Beans", "Medium roast"],
+        [17, "Yoga Mat", "Non-slip surface"],
+        [18, "Steel Bottle", "750ml"],
+        [19, "Trail Backpack", ""],
+        [20, "Gift Card", "Digital delivery"]
+      ],
+      "hints": [
+        "IS NOT NULL"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": false,
+      "orderMatters": false,
+      "schemaNote": "빈 문자열은 NULL이 아니므로 결과에 포함됩니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+    },
+    {
+      "id": "B16",
+      "title": "앞의 상품 수 제한하기",
+      "branch": "warmup",
+      "concept": "LIMIT로 조회할 행 수를 제한합니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 ORDER BY 정렬열 ASC LIMIT 개수;",
+      "requirements": [
+        "product_id와 product_name을 조회한다.",
+        "product_id 오름차순으로 먼저 정렬한다.",
+        "LIMIT로 앞의 5행만 조회한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name"
+      ],
+      "expectedRows": [
+        [1, "Wireless Mouse"],
+        [2, "Mechanical Keyboard"],
+        [3, "USB-C Hub"],
+        [4, "Noise-Canceling Headphones"],
+        [5, "Cotton T-Shirt"]
+      ],
+      "hints": [
+        "ORDER BY",
+        "LIMIT"
+      ],
+      "minutes": 2,
+      "optional": false,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "product_id로 정렬한 뒤 LIMIT를 적용하면 항상 앞의 5개 상품을 확인할 수 있습니다."
     },
     {
       "id": "S1",

@@ -2,7 +2,7 @@
   const KEYWORDS = [
     'SELECT', 'FROM', 'AS', 'DISTINCT', 'WHERE', 'AND', 'OR', 'IN', 'LIKE',
     'LOWER', 'TRIM', 'IS', 'NOT', 'NULL', 'BETWEEN', 'ORDER', 'BY', 'ASC',
-    'DESC', 'ROUND'
+    'DESC', 'ROUND', 'LIMIT'
   ];
 
   function createCandidates(schema) {
