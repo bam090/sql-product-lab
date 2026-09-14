@@ -38,6 +38,16 @@ test('replaces only the token around a middle cursor and preserves the query', (
   assert.equal(completed.cursor, 'SELECT product_name'.length);
 });
 
+test('offers short keywords from the first letter and keeps them selectable when fully typed', () => {
+  for (const keyword of ['AS', 'OR', 'IN', 'IS', 'BY']) {
+    for (const prefix of [keyword[0].toLowerCase(), keyword.toLowerCase()]) {
+      const match = markedCompletion(`SELECT product_name ${prefix}|`);
+      assert.ok(match.items.some((item) => item.value === keyword), keyword + ': ' + prefix);
+    }
+  }
+  assert.equal(markedCompletion('SELECT product_name |'), null);
+});
+
 test('does not suggest inside SQL strings, quoted identifiers, or comments', () => {
   const blocked = [
     "SELECT 'SEL|ECT'",

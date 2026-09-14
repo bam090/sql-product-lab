@@ -65,11 +65,11 @@
     if (!Number.isInteger(cursor) || cursor < 0 || cursor > sql.length || !isCodePosition(sql, cursor)) return null;
     const range = tokenRange(sql, cursor);
     const prefix = sql.slice(range.start, cursor);
-    if (prefix.length < 2 || !/^[A-Za-z_][A-Za-z0-9_.]*$/.test(prefix)) return null;
+    if (!/^[A-Za-z_][A-Za-z0-9_.]*$/.test(prefix)) return null;
     const foldedPrefix = prefix.toUpperCase();
     const items = candidates.filter((candidate) => {
       const foldedValue = candidate.value.toUpperCase();
-      return foldedValue.startsWith(foldedPrefix) && foldedValue !== foldedPrefix;
+      return foldedValue.startsWith(foldedPrefix) && (foldedValue !== foldedPrefix || (candidate.kind === '키워드' && foldedValue.length === 2));
     }).slice(0, limit);
     return items.length ? { range, items } : null;
   }
