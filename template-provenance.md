@@ -2,9 +2,9 @@
 
 - 작성: AI 제공 시작 코드. 사용자 학습·수행 완료 근거가 아님.
 - 템플릿: v1 / catalog
-- 원본 위치: /Users/goonbam/Documents/ChatGPT/옵시디언/밤위키 복습/템플릿/v1
+- 원본: 개인 학습용 catalog/common 템플릿 v1
 - 생성 시각(UTC): 2026-09-14T10:27:03.545913+00:00
-- 상태: 화면 뼈대 복사 완료, 목표별 과제 조립·검증 대기.
+- 현재 상태: SQL 과제 조립 및 로컬 실행·조회 검증 완료. 아래 해시는 최초 복사 시점의 기록입니다.
 
 | 파일 | SHA-256 |
 |---|---|
@@ -34,4 +34,4 @@
 - Approved Earthy Green palette: CAD2C5, 84A98C, 52796F, 354F52, 2F3E46. Error: 9B2828.
 - UI reference: shadcn/ui labels, input help and error states; no React dependency.
 - Dataset: 20 synthetic products. Reference answers remain outside this project.
-- Supabase project creation and real SQL verification await organization/cost confirmation.
+- Supabase project creation and real SQL verification completed in the author's local environment. Each reader configures a separate database as described in README.md.

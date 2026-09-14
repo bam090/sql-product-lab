@@ -14,6 +14,8 @@
 
 ## 2. 실행하기
 
+GitHub에서 내려받았다면 먼저 아래 **처음 실행하는 사람의 DB 설정**을 완료하세요. Java 서버를 직접 실행하는 프로젝트이며 GitHub Pages용 사이트는 아닙니다.
+
 1. IntelliJ에서 **이 README가 있는 `sql-product-lab` 폴더**를 엽니다.
 2. Project SDK와 Gradle JVM을 **Java 25**로 선택합니다. 수업의 BlogRest와 같은 **Spring Boot 4.1.1**입니다.
 3. `ReviewApplication`을 실행하거나 아래 명령을 실행합니다. 실행 설정의 작업 디렉터리도 이 프로젝트 루트여야 합니다.
@@ -30,14 +32,37 @@ IntelliJ에서 SQL 파일을 수정했다면 저장 후 화면의 **파일 다�
 
 SQL 편집기에서 한 글자 이상 입력하면 키워드·테이블·컬럼명 후보가 나타납니다. `↑`·`↓`로 고르고 `Enter` 또는 `Tab`으로 확정하며, `Esc`로 닫을 수 있습니다. 후보가 없을 때 `Enter`는 줄바꿈, `Tab`은 공백 4칸 들여쓰기, `Shift + Tab`은 들여쓰기 줄이기입니다. 여러 줄을 선택해 함께 조절할 수도 있습니다. 편집기 밖으로 이동하려면 `Esc`를 누른 뒤 `Tab`을 누르세요.
 
-> **DB 연결 완료:** 서울 리전의 무료 Supabase 프로젝트 `sql-product-lab`에 연결되어 있습니다. 연습용 상품 20개를 실제로 조회합니다. 연결 설정은 이미 준비했으므로 위 실행 순서대로 시작하세요. 기존 `festival-recommendation` 데이터베이스와는 별개입니다.
+> **각자의 DB를 사용합니다.** 저장소에는 연습 데이터와 연결 설정 예시만 포함됩니다. 실제 접속 주소·계정·비밀번호는 포함하지 않습니다. 이미 로컬에 연결 설정을 마쳤다면 그대로 실행하세요.
 
 <details>
-<summary>DB 연결 설정이 필요한 경우</summary>
+<summary>처음 실행하는 사람의 DB 설정</summary>
 
-연습 전용 Supabase 프로젝트를 준비한 뒤 `config/local.properties.example`을 `config/local.properties`로 복사하고, 실제 연결 주소와 조회 전용 계정을 입력합니다. 이 파일은 Git에서 제외됩니다. 기존 프로젝트의 관리자 계정을 넣지 않습니다.
+1. 본인의 연습 전용 Supabase 프로젝트를 준비합니다. 기존 서비스 데이터가 있는 DB와 분리하세요.
+2. 해당 프로젝트의 SQL Editor에서 [setup/seed.sql](setup/seed.sql)을 **처음 한 번** 실행합니다. `practice.products` 테이블과 연습 상품 20개를 만듭니다. 테이블이 이미 있다면 반복 실행하지 마세요.
+3. 같은 SQL Editor에서 아래 초기 권한 설정을 한 번 실행합니다. 비밀번호 자리에는 본인이 생성한 비밀번호를 넣습니다. 이 계정에는 연습 테이블 조회 권한만 부여합니다.
 
-`setup/seed.sql`은 AI가 연습용 데이터베이스를 처음 준비할 때 쓰는 파일입니다. 학습자가 작성할 과제가 아닙니다. 이번 범위는 조회이므로 INSERT·UPDATE·DELETE는 실행 대상에 포함하지 않습니다.
+```sql
+CREATE ROLE practice_reader LOGIN PASSWORD '본인이_정한_비밀번호';
+GRANT USAGE ON SCHEMA practice TO practice_reader;
+GRANT SELECT ON practice.products TO practice_reader;
+ALTER TABLE practice.products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY practice_reader_select ON practice.products
+    FOR SELECT TO practice_reader USING (true);
+```
+
+4. [config/local.properties.example](config/local.properties.example)을 같은 폴더의 `local.properties`로 복사합니다. Supabase의 **Connect → Session pooler**에서 호스트와 프로젝트 참조값을 확인해 아래 세 값을 채웁니다. 비밀번호는 위에서 만든 `practice_reader` 계정의 값입니다.
+
+```properties
+lab.database.url=jdbc:postgresql://POOLER_HOST:5432/postgres
+lab.database.user=practice_reader.PROJECT_REF
+lab.database.password=본인이_정한_비밀번호
+```
+
+`POOLER_HOST`와 `PROJECT_REF`는 예시 문자열이므로 실제 값으로 바꿔야 합니다. 이 앱은 SSL 연결을 사용합니다. 실제 `config/local.properties`는 Git에서 제외되며, DB 관리자 계정이나 API 키를 넣지 않습니다.
+
+5. 위 실행 순서대로 서버를 켜고 화면에 **Supabase 연결됨**, 원본 테이블에 **20행**이 보이는지 확인합니다.
+
+초기 DB 준비는 한 번만 하면 됩니다. 이후 학습자가 작성할 과제는 `sql/`의 SELECT 문이며 INSERT·UPDATE·DELETE는 실습 화면에서 실행하지 않습니다. 자세한 연결 방식은 [Supabase 연결 안내](https://supabase.com/docs/guides/database/connecting-to-postgres), 계정 권한은 [Postgres Roles 안내](https://supabase.com/docs/guides/database/postgres/roles)를 참고하세요.
 
 </details>
 
