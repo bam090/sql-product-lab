@@ -10,9 +10,9 @@
 - 미리 구현한 부분: 화면, SQL 파일 읽기·저장, 쿼리 실행, 결과 표, 오류 표시, 기대 결과 비교.
 - 정답 SQL은 이 프로젝트에 포함하지 않았습니다.
 
-**현재 브랜치: `codex/start` · 전체 안내**
+**현재 브랜치: `codex/select` · 열 선택과 결과 가공**
 
-전체 문제를 볼 수 있는 시작 상태입니다. 개념별로 연습하려면 아래 브랜치 안내에 따라 `codex/select`로 전환하세요.
+이번 브랜치에서는 S1~S3을 풉니다. WHERE 조건은 다음 연습에서 다룹니다.
 
 ## 2. 실행하기
 
@@ -113,127 +113,12 @@ SQL은 PostgreSQL 문법으로 실행합니다. 문자열은 `'KRW'`처럼 작�
 
 </details>
 
-### F1. 가격 범위와 재고 조건
 
-작성 파일: [sql/F1.sql](sql/F1.sql) · 약 6분 · `codex/filters`
 
-- 가격이 20 이상 50 이하인 상품을 찾는다.
-- 재고가 1개 이상인 상품만 남긴다.
-- price, product_id 순서로 오름차순 정렬한다.
 
-완료 확인: `product_id`, `product_name`, `price`, `stock_quantity` 열을 순서대로 반환하고, 기대 결과 8행과 값·순서가 일치합니다.
 
-<details>
-<summary>키워드 힌트</summary>
 
-`BETWEEN`, `AND`
 
-</details>
-
-### F2. 카테고리와 이름 패턴 검색
-
-작성 파일: [sql/F2.sql](sql/F2.sql) · 약 5분 · `codex/filters`
-
-- Electronics 또는 Books 카테고리만 대상으로 한다.
-- 이름에 SQL이 들어가거나 Wireless로 시작하는 상품을 찾는다.
-- product_id 오름차순으로 정렬한다.
-
-완료 확인: `product_id`, `product_name`, `category` 열을 순서대로 반환하고, 기대 결과 3행과 값·순서가 일치합니다.
-
-<details>
-<summary>키워드 힌트</summary>
-
-`IN`, `LIKE`, `AND`, `OR`, `괄호`
-
-</details>
-
-### F3. NULL과 빈 설명 검색
-
-작성 파일: [sql/F3.sql](sql/F3.sql) · 약 5분 · `codex/filters`
-
-- description이 NULL이거나 TRIM 뒤 빈 문자열인 상품을 찾는다.
-- product_id 오름차순으로 정렬한다.
-
-완료 확인: `product_id`, `product_name`, `description` 열을 순서대로 반환하고, 기대 결과 8행과 값·순서가 일치합니다.
-
-<details>
-<summary>키워드 힌트</summary>
-
-`IS NULL`, `TRIM`, `OR`
-
-</details>
-
-### F4. 9월 출시 범위 검색
-
-작성 파일: [sql/F4.sql](sql/F4.sql) · 약 6분 · `codex/filters`
-
-- 2026-09-01 00:00:00 이상을 포함한다.
-- 2026-10-01 00:00:00 미만만 포함한다.
-- released_at, product_id 순서로 오름차순 정렬한다.
-
-완료 확인: `product_id`, `product_name`, `released_at` 열을 순서대로 반환하고, 기대 결과 13행과 값·순서가 일치합니다.
-
-<details>
-<summary>키워드 힌트</summary>
-
-`>= 시작`, `< 다음 달 시작`
-
-</details>
-
-### I1. 입고 준비 목록 통합 조회
-
-작성 파일: [sql/I1.sql](sql/I1.sql) · 약 7분 · `codex/integration`
-
-- Electronics 또는 Books 카테고리만 대상으로 한다.
-- 재고가 있고 2026년 9월에 출시된 상품만 남긴다.
-- description이 NULL도 빈 문자열도 아닌 상품만 남긴다.
-- product_name을 product로 반환한다.
-- price와 stock_quantity를 곱하고 소수 둘째 자리까지 반올림해 inventory_value로 반환한다.
-- 고정 문자열 ready를 status로 반환한다.
-- product_id 오름차순으로 정렬한다.
-
-완료 확인: `product_id`, `product`, `inventory_value`, `status` 열을 순서대로 반환하고, 기대 결과 3행과 값·순서가 일치합니다.
-
-<details>
-<summary>키워드 힌트</summary>
-
-`IN`, `AND`, `IS NOT NULL`, `TRIM`, `ROUND`, `AS`
-
-</details>
-
-### O1. 대소문자 형태를 맞춘 SQL 검색 · 선택
-
-작성 파일: [sql/O1.sql](sql/O1.sql) · 약 5분 · `codex/filters`
-
-- LOWER로 product_name의 대소문자 형태를 맞춘다.
-- 이름에 sql이 들어간 상품을 찾는다.
-- product_id 오름차순으로 정렬한다.
-
-완료 확인: `product_id`, `product_name` 열을 순서대로 반환하고, 기대 결과 2행과 값·순서가 일치합니다.
-
-<details>
-<summary>키워드 힌트</summary>
-
-`LOWER`, `LIKE`
-
-</details>
-
-### O2. 9월 14일 하루 범위 검색 · 선택
-
-작성 파일: [sql/O2.sql](sql/O2.sql) · 약 5분 · `codex/filters`
-
-- 2026-09-14 00:00:00 이상을 포함한다.
-- 2026-09-15 00:00:00 미만만 포함한다.
-- released_at, product_id 순서로 오름차순 정렬한다.
-
-완료 확인: `product_id`, `product_name`, `released_at` 열을 순서대로 반환하고, 기대 결과 2행과 값·순서가 일치합니다.
-
-<details>
-<summary>키워드 힌트</summary>
-
-`>= 하루 시작`, `< 다음 날 시작`
-
-</details>
 
 ## 5. 브랜치 안내
 
