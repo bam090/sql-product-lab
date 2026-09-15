@@ -89,3 +89,30 @@ test('completes grouping and join syntax with columns from both tables', () => {
     assert.ok(joined.some((item) => item.value === value), value);
   }
 });
+
+test('JOIN aliases limit columns, preserve qualifiers, and keep alias entry quiet', () => {
+  const joined = autocomplete.createCandidates([schema, {
+    name: 'practice', table: 'categories', columns: [{ name: 'category' }, { name: 'category_name' }]
+  }]);
+  const from = 'FROM practice.products AS p\nJOIN practice.categories AS c\nON ';
+  function complete(sql, cursor = sql.length) { return autocomplete.completions(sql, cursor, joined); }
+  assert.deepEqual(complete(from + 'c.').items.map(x => x.value), ['category', 'category_name']);
+  assert.ok(complete(from + 'p.').items.some(x => x.value === 'product_name'));
+  assert.equal(complete(from + 'p.').items.some(x => x.value === 'category_name'), false);
+  const sql = from + 'p.category = c.cat';
+  const match = complete(sql);
+  assert.equal(autocomplete.applyCompletion(sql, match.range, 'category').text, from + 'p.category = c.category');
+  const middle = from + 'p.category = c.cat_wrong AND p.price > 10';
+  assert.equal(autocomplete.applyCompletion(middle, complete(middle, middle.indexOf('cat_wrong') + 3).range, 'category').text,
+    from + 'p.category = c.category AND p.price > 10');
+  assert.equal(complete(from + 'unknown.'), null);
+  assert.equal(complete('SELECT * FROM practice.products AS '), null);
+  assert.equal(complete('SELECT * FROM practice.products AS pr'), null);
+  assert.ok(complete('SELECT * FROM ').items.every(x => x.kind === '테이블'));
+  assert.deepEqual(complete('SELECT * FROM practice.products p JOIN practice.cat').items.map(x => x.value), ['practice.categories']);
+  assert.deepEqual(complete('SELECT * FROM practice.products p JOIN practice.categories c ON C.cat').items.map(x => x.value), ['category', 'category_name']);
+  assert.equal(complete("SELECT 'JOIN practice.categories AS c' FROM practice.products p WHERE c."), null);
+  assert.equal(complete('-- JOIN practice.categories AS c\nSELECT c.'), null);
+  const early = 'SELECT c.cat FROM practice.products p JOIN practice.categories c ON p.category = c.category';
+  assert.deepEqual(complete(early, 'SELECT c.cat'.length).items.map(x => x.value), ['category', 'category_name']);
+});
