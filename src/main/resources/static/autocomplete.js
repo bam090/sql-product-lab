@@ -2,7 +2,7 @@
   const KEYWORDS = [
     'SELECT', 'FROM', 'AS', 'DISTINCT', 'WHERE', 'AND', 'OR', 'IN', 'LIKE',
     'LOWER', 'TRIM', 'IS', 'NOT', 'NULL', 'BETWEEN', 'ORDER BY', 'BY', 'ASC',
-    'DESC', 'ROUND', 'LIMIT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END',
+    'DESC', 'ROUND', 'LIMIT', 'OFFSET', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END',
     'GROUP BY', 'COUNT', 'SUM', 'AVG', 'JOIN', 'INNER', 'LEFT', 'RIGHT',
     'FULL', 'OUTER', 'CROSS', 'ON', 'USING', 'EXISTS', 'UNION ALL', 'COALESCE'
   ];

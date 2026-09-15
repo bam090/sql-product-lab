@@ -1,0 +1,11 @@
+-- L3 · 선택 카테고리의 가격 페이지
+-- 한 줄 개념: WHERE로 대상을 먼저 고른 뒤 정렬하고 OFFSET과 LIMIT을 적용하면 검색 결과의 한 페이지를 만들 수 있습니다.
+-- 문법 틀: SELECT 열들 FROM 테이블명 WHERE 열 IN (...) ORDER BY 기준열 DESC, 고유열 ASC LIMIT 개수 OFFSET 건너뛸개수;
+-- 대상 테이블: practice.products
+-- 반환 열: product_id, product_name, category, price
+-- product_id, product_name, category, price를 조회한다.
+-- Electronics, Books, Sports 카테고리만 대상으로 삼는다.
+-- price 내림차순, product_id 오름차순으로 정렬한다.
+-- 앞의 6행을 건너뛴 뒤 다음 3행을 반환한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

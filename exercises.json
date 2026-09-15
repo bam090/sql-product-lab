@@ -1,8 +1,7 @@
 {
   "version": 1,
   "source": {
-    "title": "데이터베이스 기초와 SQL 조회·조건 연습-2026-09-14-수업 메모-정리본",
-    "sha256": "b864217cd18c2bc186cf7b77052338142fecf6ec2841da90695d394e86d7dc53",
+    "title": "SQL 조회 연습 개념",
     "scope": [
       "SELECT",
       "FROM",
@@ -26,8 +25,7 @@
     ],
     "additionalSources": [
       {
-        "title": "SQL 정렬·CASE·문자열·집계 수업 메모-2026-09-15",
-        "sha256": "33103a31738752676841a790add695ed84ef9b4a9270c4f6983ba1336bce54c8",
+        "title": "정렬·집계·페이지·JOIN 확장 개념",
         "scope": [
           "복수 열 ASC와 DESC 정렬",
           "동점 정렬 기준",
@@ -37,7 +35,13 @@
           "ORDER BY CASE 우선순위",
           "CASE를 이용한 NULL 마지막 정렬",
           "LOWER 정렬",
-          "GROUP BY와 COUNT"
+          "GROUP BY와 COUNT",
+          "LIMIT과 OFFSET",
+          "페이지 단위 조회",
+          "keyset 커서 조건",
+          "UNION ALL 뒤 전체 정렬",
+          "여러 테이블 연속 INNER JOIN",
+          "self LEFT JOIN의 미일치 행 보존"
         ]
       }
     ]
@@ -1861,6 +1865,223 @@
       "schemaNote": "category는 원본 열이고 product_count는 COUNT(*)로 새로 만드는 집계 결과 열입니다. 정렬하지 않으므로 행 순서는 채점하지 않습니다."
     },
     {
+      "id": "L1",
+      "title": "비싼 상품 세 개 고르기",
+      "branch": "practice/pagination",
+      "category": "order-by",
+      "level": "basic",
+      "concept": "LIMIT은 정렬된 결과의 앞부분만 반환하며, 고유한 열을 동점 기준으로 더하면 결과 순서가 고정됩니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블명 ORDER BY 기준열 DESC, 고유열 ASC LIMIT 개수;",
+      "requirements": [
+        "product_id, product_name, price를 조회한다.",
+        "price를 내림차순으로 정렬하고 같은 가격에서는 product_id를 오름차순으로 정렬한다.",
+        "정렬된 결과에서 앞의 3행만 반환한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "price"
+      ],
+      "expectedRows": [
+        [4, "Noise-Canceling Headphones", 129.99],
+        [2, "Mechanical Keyboard", 89.0],
+        [19, "Trail Backpack", 75.0]
+      ],
+      "hints": [
+        "ORDER BY price DESC",
+        "product_id ASC",
+        "LIMIT 3"
+      ],
+      "minutes": 4,
+      "optional": false,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "LIMIT 전에 price와 product_id로 순서를 완전히 정합니다."
+    },
+    {
+      "id": "L2",
+      "title": "최신 상품 두 번째 페이지",
+      "branch": "practice/pagination",
+      "category": "order-by",
+      "level": "basic",
+      "concept": "OFFSET은 정렬된 결과의 앞 행을 건너뛰고, LIMIT은 그다음에 가져올 행 수를 정합니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블명 ORDER BY 기준열 DESC, 고유열 DESC LIMIT 개수 OFFSET 건너뛸개수;",
+      "requirements": [
+        "product_id, product_name, released_at을 조회한다.",
+        "released_at을 내림차순으로 정렬하고 같은 시각에서는 product_id를 내림차순으로 정렬한다.",
+        "앞의 4행을 건너뛴 뒤 다음 4행을 반환한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "released_at"
+      ],
+      "expectedRows": [
+        [10, "Storage Basket", "2026-09-29T11:00"],
+        [19, "Trail Backpack", "2026-09-20T12:00"],
+        [12, "PostgreSQL Practice", "2026-09-15T00:00"],
+        [11, "SQL Basics", "2026-09-14T23:59:59"]
+      ],
+      "hints": [
+        "ORDER BY released_at DESC, product_id DESC",
+        "LIMIT 4",
+        "OFFSET 4"
+      ],
+      "minutes": 4,
+      "optional": false,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "released_at이 같아도 product_id가 다음 기준이 되어 페이지 경계가 흔들리지 않습니다."
+    },
+    {
+      "id": "L3",
+      "title": "선택 카테고리의 가격 페이지",
+      "branch": "practice/pagination",
+      "category": "order-by",
+      "level": "applied",
+      "concept": "WHERE로 대상을 먼저 고른 뒤 정렬하고 OFFSET과 LIMIT을 적용하면 검색 결과의 한 페이지를 만들 수 있습니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블명 WHERE 열 IN (...) ORDER BY 기준열 DESC, 고유열 ASC LIMIT 개수 OFFSET 건너뛸개수;",
+      "requirements": [
+        "product_id, product_name, category, price를 조회한다.",
+        "Electronics, Books, Sports 카테고리만 대상으로 삼는다.",
+        "price 내림차순, product_id 오름차순으로 정렬한다.",
+        "앞의 6행을 건너뛴 뒤 다음 3행을 반환한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "category",
+        "price"
+      ],
+      "expectedRows": [
+        [17, "Yoga Mat", "Sports", 31.0],
+        [1, "Wireless Mouse", "Electronics", 29.9],
+        [11, "SQL Basics", "Books", 28.0]
+      ],
+      "hints": [
+        "WHERE category IN (...)",
+        "ORDER BY price DESC, product_id ASC",
+        "LIMIT 3 OFFSET 6"
+      ],
+      "minutes": 5,
+      "optional": false,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "필터를 통과한 상품만 가격순으로 세고, 그 결과에서 7번째 행부터 보여 줍니다."
+    },
+    {
+      "id": "L4",
+      "title": "마지막 상품 다음부터 이어 보기",
+      "branch": "practice/pagination",
+      "category": "order-by",
+      "level": "applied",
+      "concept": "keyset 페이지는 마지막으로 본 정렬 값과 고유 키를 조건에 넣어 다음 행부터 이어서 조회합니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블명 WHERE 시간열 < 기준시각 OR (시간열 = 기준시각 AND 고유열 < 기준값) ORDER BY 시간열 DESC, 고유열 DESC LIMIT 개수;",
+      "requirements": [
+        "product_id, product_name, released_at을 조회한다.",
+        "마지막으로 본 행은 released_at이 2026-10-01 00:00:00이고 product_id가 16인 상품이라고 가정한다.",
+        "더 이른 출시 시각이거나, 출시 시각이 같으면서 product_id가 16보다 작은 상품만 고른다.",
+        "released_at과 product_id를 모두 내림차순으로 정렬하고 앞의 4행만 반환한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "released_at"
+      ],
+      "expectedRows": [
+        [7, "Running Socks", "2026-10-01T00:00"],
+        [4, "Noise-Canceling Headphones", "2026-09-30T23:59:59"],
+        [15, "Dark Chocolate", "2026-09-30T08:00"],
+        [10, "Storage Basket", "2026-09-29T11:00"]
+      ],
+      "hints": [
+        "released_at < 기준시각 OR (...)",
+        "product_id < 16",
+        "ORDER BY 두 열 DESC · LIMIT 4"
+      ],
+      "minutes": 7,
+      "optional": true,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "같은 시각에 출시된 product_id 7이 커서 뒤의 첫 행이 되는지 확인합니다."
+    },
+    {
+      "id": "L5",
+      "title": "출시 시각 구간을 작은 배치로 읽기",
+      "branch": "practice/pagination",
+      "category": "order-by",
+      "level": "applied",
+      "concept": "하한은 제외하고 상한은 포함하는 범위 조건과 오름차순 정렬로 처리 구간을 겹치지 않게 읽을 수 있습니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블명 WHERE 시간열 > 하한 AND 시간열 <= 상한 ORDER BY 시간열 ASC, 고유열 ASC LIMIT 개수;",
+      "requirements": [
+        "product_id, product_name, released_at을 조회한다.",
+        "2026-09-01 00:00:00은 제외하고 2026-09-15 00:00:00은 포함하는 출시 시각 범위를 사용한다.",
+        "released_at 오름차순, product_id 오름차순으로 정렬한다.",
+        "앞의 8행만 반환한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "released_at"
+      ],
+      "expectedRows": [
+        [20, "Gift Card", "2026-09-01T12:00"],
+        [14, "Oat Granola", "2026-09-03T08:00"],
+        [8, "Desk Lamp", "2026-09-05T18:00"],
+        [6, "Linen Shirt", "2026-09-10T10:00"],
+        [17, "Yoga Mat", "2026-09-12T07:00"],
+        [3, "USB-C Hub", "2026-09-14T09:30"],
+        [11, "SQL Basics", "2026-09-14T23:59:59"],
+        [12, "PostgreSQL Practice", "2026-09-15T00:00"]
+      ],
+      "hints": [
+        "> 하한",
+        "<= 상한",
+        "ORDER BY released_at ASC, product_id ASC · LIMIT 8"
+      ],
+      "minutes": 6,
+      "optional": true,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "product_id 2의 하한 시각은 빠지고 product_id 12의 상한 시각은 포함됩니다."
+    },
+    {
+      "id": "L6",
+      "title": "두 재고 목록의 앞부분 합치기",
+      "branch": "practice/pagination",
+      "category": "order-by",
+      "level": "applied",
+      "concept": "분기별 정렬과 LIMIT을 UNION ALL 안쪽에 적용하고, 바깥 SELECT의 ORDER BY로 합친 전체 결과를 정렬합니다.",
+      "syntaxFrame": "SELECT 열들 FROM ((SELECT ... ORDER BY ... LIMIT ...) UNION ALL (SELECT ...)) AS 합친결과 ORDER BY 구분열, 정렬열;",
+      "requirements": [
+        "첫 SELECT는 재고가 0인 상품을 product_id 오름차순으로 정렬해 2행만 고르고 queue_source를 sold_out으로 반환한다.",
+        "둘째 SELECT는 재고가 1 이상 5 이하인 상품을 product_id 오름차순으로 정렬해 2행만 고르고 queue_source를 low_stock으로 반환한다.",
+        "두 SELECT 모두 product_id를 sort_id라는 이름으로 반환하고 product_name도 함께 반환한다.",
+        "두 결과를 UNION ALL로 합친 뒤 queue_source, sort_id 오름차순으로 최종 정렬한다."
+      ],
+      "columns": [
+        "queue_source",
+        "sort_id",
+        "product_name"
+      ],
+      "expectedRows": [
+        ["low_stock", 4, "Noise-Canceling Headphones"],
+        ["low_stock", 10, "Storage Basket"],
+        ["sold_out", 3, "USB-C Hub"],
+        ["sold_out", 7, "Running Socks"]
+      ],
+      "hints": [
+        "UNION ALL 결과를 바깥 SELECT의 FROM에 넣기",
+        "ORDER BY ... LIMIT 2",
+        "바깥 SELECT에서 최종 ORDER BY"
+      ],
+      "minutes": 8,
+      "optional": true,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "수업에서 확인한 UNION ALL 최종 정렬과 LIMIT을 상품 재고 예제로 결합한 전이 문제입니다. 분기별 LIMIT과 전체 ORDER BY의 적용 위치를 구분합니다."
+    },
+    {
       "id": "J1",
       "title": "상품과 카테고리 이름 연결",
       "category": "joins",
@@ -2301,6 +2522,92 @@
       "sortRequired": true,
       "orderMatters": true,
       "schemaNote": "Stationery는 카테고리 쪽에만, Other인 Gift Card는 상품 쪽에만 있습니다."
+    },
+    {
+      "id": "J9",
+      "title": "도서 상품에 두 표 연속 연결",
+      "category": "joins",
+      "level": "applied",
+      "branch": "practice/joins",
+      "tables": [
+        "products",
+        "categories",
+        "price_bands"
+      ],
+      "concept": "앞 JOIN의 결과에 다음 JOIN을 이어 쓰면 한 조회에서 세 테이블의 정보를 연결할 수 있습니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블1 AS 별칭1 INNER JOIN 테이블2 AS 별칭2 ON 조건 INNER JOIN 테이블3 AS 별칭3 ON 조건 WHERE 조건 ORDER BY 정렬열들;",
+      "requirements": [
+        "products에서 시작해 categories를 category가 같은 조건으로 INNER JOIN한다.",
+        "이어서 price_bands를 price가 min_price 이상 max_price 이하인 조건으로 INNER JOIN한다.",
+        "Books 상품만 product_id, product_name, category_name, band_name, price 순서로 반환한다.",
+        "price 내림차순, product_id 오름차순, band_id 오름차순으로 정렬한다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "category_name",
+        "band_name",
+        "price"
+      ],
+      "expectedRows": [
+        [13, "Spring Boot Intro", "도서", "Standard", 41.0],
+        [12, "PostgreSQL Practice", "도서", "Standard", 36.5],
+        [11, "SQL Basics", "도서", "Budget", 28.0],
+        [11, "SQL Basics", "도서", "Standard", 28.0]
+      ],
+      "hints": [
+        "products → categories → price_bands",
+        "INNER JOIN을 두 번 이어 쓰기",
+        "마지막 동점 기준은 band_id"
+      ],
+      "minutes": 8,
+      "optional": true,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "SQL Basics는 겹치는 두 가격 밴드에 연결되므로 band_id를 마지막 정렬 기준으로 사용합니다."
+    },
+    {
+      "id": "J10",
+      "title": "더 비싼 식품이 없는 행도 남기기",
+      "category": "joins",
+      "level": "applied",
+      "branch": "practice/joins",
+      "tables": [
+        "products"
+      ],
+      "concept": "self LEFT JOIN은 같은 테이블의 행을 비교하면서 오른쪽에 맞는 행이 없는 왼쪽 행도 NULL과 함께 보존합니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블 AS 왼쪽별칭 LEFT JOIN 테이블 AS 오른쪽별칭 ON 같은그룹조건 AND 비교조건 WHERE 조건 ORDER BY 정렬열들;",
+      "requirements": [
+        "products에 p와 higher라는 별칭을 붙여 LEFT JOIN한다.",
+        "category가 같고 higher.price가 p.price보다 큰 상품을 연결한다.",
+        "Food 상품만 반환하고 p의 product_id, product_name, price와 higher의 같은 세 열을 조회한다.",
+        "higher의 세 열에는 higher_product_id, higher_product_name, higher_price 별칭을 붙인다.",
+        "p.product_id, higher.product_id 순서로 오름차순 정렬한다. 더 비싼 상품이 없는 Coffee Beans도 NULL과 함께 남긴다."
+      ],
+      "columns": [
+        "product_id",
+        "product_name",
+        "price",
+        "higher_product_id",
+        "higher_product_name",
+        "higher_price"
+      ],
+      "expectedRows": [
+        [14, "Oat Granola", 8.9, 16, "Coffee Beans", 18.0],
+        [15, "Dark Chocolate", 6.5, 14, "Oat Granola", 8.9],
+        [15, "Dark Chocolate", 6.5, 16, "Coffee Beans", 18.0],
+        [16, "Coffee Beans", 18.0, null, null, null]
+      ],
+      "hints": [
+        "LEFT JOIN practice.products AS higher",
+        "같은 category와 더 큰 price를 ON에 함께 쓰기",
+        "WHERE p.category = 'Food'"
+      ],
+      "minutes": 8,
+      "optional": true,
+      "sortRequired": true,
+      "orderMatters": true,
+      "schemaNote": "LEFT JOIN의 오른쪽 조건은 ON에 둡니다. Coffee Beans보다 비싼 Food 상품이 없어 higher 열이 NULL로 남습니다."
     }
   ],
   "schemas": [

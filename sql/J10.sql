@@ -1,0 +1,12 @@
+-- J10 · 더 비싼 식품이 없는 행도 남기기
+-- 한 줄 개념: self LEFT JOIN은 같은 테이블의 행을 비교하면서 오른쪽에 맞는 행이 없는 왼쪽 행도 NULL과 함께 보존합니다.
+-- 문법 틀: SELECT 열들 FROM 테이블 AS 왼쪽별칭 LEFT JOIN 테이블 AS 오른쪽별칭 ON 같은그룹조건 AND 비교조건 WHERE 조건 ORDER BY 정렬열들;
+-- 대상 테이블: practice.products
+-- 반환 열: product_id, product_name, price, higher_product_id, higher_product_name, higher_price
+-- products에 p와 higher라는 별칭을 붙여 LEFT JOIN한다.
+-- category가 같고 higher.price가 p.price보다 큰 상품을 연결한다.
+-- Food 상품만 반환하고 p의 product_id, product_name, price와 higher의 같은 세 열을 조회한다.
+-- higher의 세 열에는 higher_product_id, higher_product_name, higher_price 별칭을 붙인다.
+-- p.product_id, higher.product_id 순서로 오름차순 정렬한다. 더 비싼 상품이 없는 Coffee Beans도 NULL과 함께 남긴다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

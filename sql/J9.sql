@@ -1,0 +1,11 @@
+-- J9 · 도서 상품에 두 표 연속 연결
+-- 한 줄 개념: 앞 JOIN의 결과에 다음 JOIN을 이어 쓰면 한 조회에서 세 테이블의 정보를 연결할 수 있습니다.
+-- 문법 틀: SELECT 열들 FROM 테이블1 AS 별칭1 INNER JOIN 테이블2 AS 별칭2 ON 조건 INNER JOIN 테이블3 AS 별칭3 ON 조건 WHERE 조건 ORDER BY 정렬열들;
+-- 대상 테이블: practice.products, practice.categories, practice.price_bands
+-- 반환 열: product_id, product_name, category_name, band_name, price
+-- products에서 시작해 categories를 category가 같은 조건으로 INNER JOIN한다.
+-- 이어서 price_bands를 price가 min_price 이상 max_price 이하인 조건으로 INNER JOIN한다.
+-- Books 상품만 product_id, product_name, category_name, band_name, price 순서로 반환한다.
+-- price 내림차순, product_id 오름차순, band_id 오름차순으로 정렬한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

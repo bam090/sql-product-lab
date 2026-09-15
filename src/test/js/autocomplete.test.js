@@ -26,6 +26,7 @@ function markedCompletion(markedSql) {
 test('matches keywords, the catalog table, and matching catalog columns', () => {
   assert.deepEqual(markedCompletion('SEL|').items.map((item) => item.value), ['SELECT']);
   assert.deepEqual(markedCompletion('SELECT * FROM practice.products LIM|').items.map((item) => item.value), ['LIMIT']);
+  assert.deepEqual(markedCompletion('SELECT * FROM practice.products OFF|').items.map((item) => item.value), ['OFFSET']);
   assert.deepEqual(markedCompletion('SELECT * FROM pra|').items.map((item) => item.value), ['practice.products']);
   assert.deepEqual(markedCompletion('SELECT product_|').items.map((item) => item.value), ['product_id', 'product_name']);
 });
