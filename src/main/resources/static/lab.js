@@ -55,6 +55,11 @@ function table(target, columns, rows) {
   rows.forEach((row) => { const r = document.createElement('tr'); row.forEach((v) => r.append(cell('td', v))); body.append(r); });
   t.append(body); target.append(t);
 }
+function placeholder(text) {
+  const message = cell('p', text);
+  message.className = 'empty';
+  return message;
+}
 function error(message) { $('error').hidden = !message; $('error').textContent = message; }
 function adjustIndent(text, start, end, outdent) {
   if (start === end && !outdent) {
@@ -214,14 +219,16 @@ async function select(exercise) {
   $('requirements').replaceChildren(...exercise.requirements.map((r) => cell('li', r)));
   $('syntax-frame').hidden = !exercise.syntaxFrame;
   $('syntax-frame').textContent = exercise.syntaxFrame ? `문법 틀: ${exercise.syntaxFrame}` : '';
-  $('syntax-help').open = exercise.level === 'basic';
+  $('syntax-help').open = false;
+  $('problem-details').open = true;
   $('before-hints').textContent = exercise.hints.join(' · ');
-  $('hints').textContent = exercise.hints.join(' · ');
+  $('concept').textContent = exercise.concept || '';
+  $('concept-panel').hidden = !exercise.concept;
   table($('expected'), exercise.columns, exercise.expectedRows);
   document.querySelectorAll('.exercise').forEach((b) => { b.classList.toggle('active', b.dataset.id === exercise.id); b.setAttribute('aria-current', b.dataset.id === exercise.id ? 'step' : 'false'); });
   error(''); comparison(''); $('result-meta').textContent = '';
   $('after-run').hidden = true;
-  $('result').replaceChildren(cell('p', 'SQL을 실행하면 실제 조회 결과가 표시됩니다.'));
+  $('result').replaceChildren(placeholder('SQL을 실행하면 실제 조회 결과가 표시됩니다.'));
   await load(false);
 }
 async function load(force) {
@@ -256,7 +263,7 @@ async function run() {
   if (busy || !current || $('sql').readOnly) return;
   closeAutocomplete();
   busy = true; $('run').disabled = true; $('run').textContent = '실행 중…'; error(''); comparison('실행 결과를 확인하고 있어요…', 'loading');
-  $('result-meta').textContent = ''; $('result').replaceChildren(cell('p', 'SQL을 실행하고 있어요…'));
+  $('result-meta').textContent = ''; $('result').replaceChildren(placeholder('SQL을 실행하고 있어요…'));
   $('after-run').hidden = false;
   try {
     const result = await api('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exerciseId: current.id, sql: $('sql').value }) });
@@ -266,7 +273,7 @@ async function run() {
     const same = SqlResultComparison.matches(result, comparedExercise);
     const retry = current.orderMatters === false ? '반환 열과 값을 확인해 보세요.' : '반환 열·값·정렬 순서를 확인해 보세요.';
     comparison(same ? '정답이에요 · 기대 결과와 같아요' : `아직 정답이 아니에요 · ${retry}`, same ? '' : 'mismatch');
-  } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(); $('result-meta').textContent = ''; }
+  } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(placeholder('실행하지 못했어요. 위의 오류 내용을 확인해 주세요.')); $('result-meta').textContent = ''; }
   finally { busy = false; $('run').disabled = false; $('run').textContent = '실행하기 →'; }
 }
 $('run').addEventListener('click', run);
