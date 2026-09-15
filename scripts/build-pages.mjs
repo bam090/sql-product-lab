@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
@@ -40,5 +41,10 @@ const replacements = new Map([
 for (const [from, to] of replacements) {
   if (!html.includes(from)) throw new Error(`index.html 변환 대상을 찾지 못했습니다: ${from}`);
   html = html.replace(from, to);
+}
+// Changed assets get new URLs so returning learners do not keep stale editor styles/scripts.
+for (const file of ['style.css', 'autocomplete.js', 'result-comparison.js', 'lab.js', 'browser-api.js']) {
+  const hash = createHash('sha256').update(await readFile(new URL(file, output))).digest('hex').slice(0, 12);
+  html = html.replaceAll(`"./${file}"`, `"./${file}?v=${hash}"`);
 }
 await writeFile(new URL('index.html', output), html);
