@@ -48,7 +48,7 @@ public class DatabaseQueryService {
             try {
                 connection.setReadOnly(true);
                 connection.setAutoCommit(false);
-                setStatementTimeout(connection);
+                configureReadOnlyQuery(connection);
                 QueryRows queryRows = readRows(connection, sql);
                 long elapsedMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
                 return new QueryResult(
@@ -82,7 +82,7 @@ public class DatabaseQueryService {
             try {
                 connection.setReadOnly(true);
                 connection.setAutoCommit(false);
-                setStatementTimeout(connection);
+                configureReadOnlyQuery(connection);
                 try (Statement statement = connection.createStatement();
                         ResultSet resultSet = statement.executeQuery("select 1")) {
                     if (!resultSet.next() || resultSet.getInt(1) != 1) {
@@ -149,10 +149,11 @@ public class DatabaseQueryService {
         }
     }
 
-    private void setStatementTimeout(Connection connection) throws SQLException {
+    private void configureReadOnlyQuery(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(3);
             statement.execute("set local statement_timeout = '3s'");
+            statement.execute("set local search_path = pg_catalog, practice");
         }
     }
 

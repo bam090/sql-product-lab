@@ -81,7 +81,7 @@ function normalizeValue(value, dataTypeID) {
 export async function runReadOnlyQuery(db, sql) {
   const query = validateSingleSelect(sql);
   const startedAt = performance.now();
-  await db.exec("BEGIN TRANSACTION READ ONLY; SET LOCAL statement_timeout = '3000ms';");
+  await db.exec("BEGIN TRANSACTION READ ONLY; SET LOCAL statement_timeout = '3000ms'; SET LOCAL search_path = pg_catalog, practice;");
   try {
     const result = await db.query(`SELECT * FROM (\n${query}\n) AS __lab_query LIMIT ${RESULT_LIMIT + 1}`, [], { rowMode: 'array' });
     const truncated = result.rows.length > RESULT_LIMIT;

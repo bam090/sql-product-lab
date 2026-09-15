@@ -41,6 +41,14 @@ test('PGlite runs the catalog queries and SqlResultComparison checks their resul
   context.after(() => db.close());
   await seedDatabase(db, seedSql);
 
+  const qualified = await runReadOnlyQuery(db, 'SELECT p.product_id, c.category_name FROM practice.products p JOIN practice.categories c ON p.category = c.category ORDER BY p.product_id');
+  const short = await runReadOnlyQuery(db, 'SELECT p.product_id, c.category_name FROM products p JOIN categories c ON p.category = c.category ORDER BY p.product_id');
+  assert.deepEqual(short.rows, qualified.rows);
+  assert.deepEqual(short.columns, qualified.columns);
+  assert.equal((await runReadOnlyQuery(db, 'SELECT * FROM products')).rowCount, 20);
+  await assert.rejects(runReadOnlyQuery(db, 'SELECT * FROM missing_table'));
+  assert.equal((await runReadOnlyQuery(db, 'SELECT * FROM products')).rowCount, 20);
+
   let queries = { B1: 'SELECT * FROM practice.products' };
   if (process.env.SQL_LAB_QUERY_FIXTURE) {
     queries = JSON.parse(await readFile(process.env.SQL_LAB_QUERY_FIXTURE, 'utf8'));

@@ -23,6 +23,10 @@ await Promise.all([
   build({ entryPoints: [fileURLToPath(new URL('../pages/db-worker.js', import.meta.url))], outfile: fileURLToPath(new URL('db-worker.js', output)), bundle: true, format: 'esm', platform: 'browser', target: 'es2022' })
 ]);
 
+const workerHash = createHash('sha256').update(await readFile(new URL('db-worker.js', output))).digest('hex').slice(0, 12);
+const browserApi = await readFile(new URL('browser-api.js', output), 'utf8');
+await writeFile(new URL('browser-api.js', output), browserApi.replaceAll('./db-worker.js', `./db-worker.js?v=${workerHash}`));
+
 let html = await readFile(new URL('../src/main/resources/templates/index.html', import.meta.url), 'utf8');
 const replacements = new Map([
   ['href="/style.css"', 'href="./style.css"'],

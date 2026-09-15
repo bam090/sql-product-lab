@@ -13,6 +13,7 @@
       ...KEYWORDS.map((value) => ({ value, kind: '키워드' })),
       ...schemas.flatMap((item) => [
         { value: item.name + '.' + item.table, kind: '테이블' },
+        { value: item.table, kind: '테이블' },
         ...item.columns.map((column) => ({ value: column.name, kind: '컬럼', tables: [item.name + '.' + item.table] }))
       ])
     ];
