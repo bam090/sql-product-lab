@@ -337,6 +337,17 @@ async function openSourceTable() {
   }
 }
 $('open-source').addEventListener('click', openSourceTable);
+// ⌘/Ctrl + B: 편집 중에도 원본 테이블을 열고 닫는다. Shift 조합은 브라우저 북마크바 몫으로 남긴다.
+// 한글 입력 상태에서는 e.key가 'ㅠ'로 들어오므로 물리 키(e.code)를 먼저 본다.
+document.addEventListener('keydown', (e) => {
+  if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+  if (e.code !== 'KeyB' && e.key.toLowerCase() !== 'b') return;
+  const dialog = $('source-dialog');
+  if (dialog.open) { e.preventDefault(); dialog.close(); return; }
+  if ($('open-source').disabled) return;
+  e.preventDefault();
+  openSourceTable();
+});
 $('table-choice').addEventListener('change', () => {
   showSchema(exerciseSchemas(current).find((schema) => schema.table === $('table-choice').value));
 });
