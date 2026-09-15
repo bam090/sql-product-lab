@@ -186,3 +186,13 @@ test('moving the caret refreshes an open popup while up/down keeps candidate nav
   handler({key: 'ArrowUp'});
   assert.equal(refreshes, 5);
 });
+
+test('unqualified table names precede schema-qualified names without breaking aliases', () => {
+  const joined = autocomplete.createCandidates([schema, {name: 'practice', table: 'categories', columns: [{name: 'category'}, {name: 'category_name'}]}]);
+  const complete = sql => autocomplete.completions(sql, sql.length, joined);
+  assert.deepEqual(complete('SELECT * FROM ').items.filter(x => x.kind === '테이블').map(x => x.value),
+    ['products', 'categories', 'practice.products', 'practice.categories']);
+  assert.equal(complete('SELECT p').items[0].value, 'products');
+  assert.equal(complete('SELECT * FROM practice.p').items[0].value, 'practice.products');
+  assert.ok(complete('SELECT * FROM products p JOIN categories c ON c.').items.some(x => x.value === 'category_name'));
+});

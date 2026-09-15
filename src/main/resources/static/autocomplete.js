@@ -119,6 +119,9 @@
     const items = available.filter((candidate) => {
       const foldedValue = candidate.value.toUpperCase();
       return foldedValue.startsWith(foldedPrefix) && (foldedValue !== foldedPrefix || (candidate.kind === '키워드' && foldedValue.length === 2));
+    }).sort((a, b) => {
+      return Number(a.kind === '테이블' && a.value.includes('.'))
+        - Number(b.kind === '테이블' && b.value.includes('.'));
     }).slice(0, limit);
     if (items.length === 1 && items[0].value.includes(' ')) {
       const trailing = items[0].value.split(' ')[1];
