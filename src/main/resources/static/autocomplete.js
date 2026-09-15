@@ -72,10 +72,19 @@
     return { start, end };
   }
 
-  function completions(sql, cursor, candidates, limit = 8) {
+  function completions(sql, cursor, candidates, limit = 6) {
     if (!Number.isInteger(cursor) || cursor < 0 || cursor > sql.length || !isCodePosition(sql, cursor)) return null;
     let range = tokenRange(sql, cursor);
     let prefix = sql.slice(range.start, cursor);
+    // Complete a multi-word keyword as one range, including an existing trailing word.
+    const phrase = sql.slice(0, cursor).match(/\b(ORDER|GROUP|UNION)[ \t]+([A-Za-z]*)$/i);
+    if (phrase && isCodePosition(sql, phrase.index)) {
+      const value = phrase[1].toUpperCase() === 'UNION' ? 'UNION ALL' : phrase[1].toUpperCase() + ' BY';
+      const prefix = phrase[1].toUpperCase() + ' ' + phrase[2].toUpperCase();
+      if (value.startsWith(prefix) && prefix !== value) {
+        return { range: { start: phrase.index, end: range.end }, items: [{ value, kind: '키워드' }] };
+      }
+    }
     const before = sql.slice(0, range.start);
     // ponytail: single SELECT with unquoted FROM/JOIN names; nested query scopes need a parser.
     const tables = candidates.filter((item) => item.kind === '테이블');
@@ -110,6 +119,11 @@
       const foldedValue = candidate.value.toUpperCase();
       return foldedValue.startsWith(foldedPrefix) && (foldedValue !== foldedPrefix || (candidate.kind === '키워드' && foldedValue.length === 2));
     }).slice(0, limit);
+    if (items.length === 1 && items[0].value.includes(' ')) {
+      const trailing = items[0].value.split(' ')[1];
+      const suffix = sql.slice(range.end).match(new RegExp('^[ \\t]+' + trailing + '\\b', 'i'));
+      if (suffix) range.end += suffix[0].length;
+    }
     return items.length ? { range, items } : null;
   }
 

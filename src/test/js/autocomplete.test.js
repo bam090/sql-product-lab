@@ -116,3 +116,51 @@ test('JOIN aliases limit columns, preserve qualifiers, and keep alias entry quie
   const early = 'SELECT c.cat FROM practice.products p JOIN practice.categories c ON p.category = c.category';
   assert.deepEqual(complete(early, 'SELECT c.cat'.length).items.map(x => x.value), ['category', 'category_name']);
 });
+
+test('partial multi-word completions preserve surrounding columns without duplicate BY', () => {
+  for (const marked of ['ORDER B| product_id', 'order | product_id', 'ORDER| BY product_id', 'ORD|ER BY product_id', 'ORDER B|Y product_id', 'ORDER\tB| product_id']) {
+    const sql = 'SELECT * FROM practice.products ' + marked.replace('|', '');
+    const cursor = 'SELECT * FROM practice.products '.length + marked.indexOf('|');
+    const match = autocomplete.completions(sql, cursor, candidates);
+    assert.equal(autocomplete.applyCompletion(sql, match.range, match.items[0].value).text,
+      'SELECT * FROM practice.products ORDER BY product_id', marked);
+  }
+  assert.equal(markedCompletion('SELECT * FROM practice.products GROUP B|').items[0].value, 'GROUP BY');
+  assert.equal(markedCompletion('SELECT * FROM practice.products UNION A|').items[0].value, 'UNION ALL');
+  assert.equal(markedCompletion("SELECT 'ORDER B|'"), null);
+  assert.equal(markedCompletion('-- ORDER B|'), null);
+  const many = Array.from({length: 12}, (_, i) => ({value: 'column_' + i, kind: '컬럼'}));
+  assert.equal(autocomplete.completions('col', 3, many).items.length, 6);
+});
+
+test('editor keys confirm suggestions, indent without suggestions, and respect composition', () => {
+  const fs = require('node:fs'), vm = require('node:vm');
+  const source = fs.readFileSync(require('node:path').join(__dirname, '../../main/resources/static/lab.js'), 'utf8');
+  let handler, calls = [];
+  const editor = {readOnly: false, addEventListener: (_, fn) => {handler = fn;}};
+  const context = vm.createContext({
+    $: () => editor, composing: false, tabMovesFocus: false, autocompleteMatch: {}, autocompleteIndex: 1,
+    acceptAutocomplete: index => calls.push(['accept', index]),
+    closeAutocomplete: () => { context.autocompleteMatch = null; calls.push(['close']); },
+    indentEditor: shift => calls.push(['indent', shift]), run: () => calls.push(['run']),
+    selectAutocomplete: () => {}
+  });
+  const start = source.indexOf("$('sql').addEventListener('keydown'");
+  vm.runInContext(source.slice(start, source.indexOf("$('sql').addEventListener('keyup'", start)), context);
+  function press(key, extra = {}) {
+    calls = []; let prevented = false;
+    handler({key, shiftKey: false, preventDefault() {prevented = true;}, ...extra});
+    return {calls, prevented};
+  }
+  assert.deepEqual(press('Enter'), {calls: [['accept', 1]], prevented: true});
+  assert.deepEqual(press('Tab'), {calls: [['accept', 1]], prevented: true});
+  context.autocompleteMatch = null;
+  assert.deepEqual(press('Enter'), {calls: [], prevented: false});
+  assert.deepEqual(press('Tab'), {calls: [['indent', false]], prevented: true});
+  assert.deepEqual(press('Tab', {shiftKey: true}), {calls: [['indent', true]], prevented: true});
+  context.autocompleteMatch = {};
+  assert.deepEqual(press('Enter', {isComposing: true}), {calls: [], prevented: false});
+  press('Escape');
+  assert.deepEqual(press('Tab'), {calls: [], prevented: false});
+  assert.deepEqual(press('Enter', {ctrlKey: true}), {calls: [['close'], ['run']], prevented: true});
+});
