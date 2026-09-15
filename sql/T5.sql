@@ -1,0 +1,11 @@
+-- T5 · 카테고리 우선순위 정렬
+-- 한 줄 개념: ORDER BY의 CASE 결과를 정렬 키로 사용하면 원하는 업무 우선순위를 만들 수 있습니다.
+-- 문법 틀: SELECT 열이름들 FROM 테이블명 ORDER BY CASE WHEN 조건1 THEN 1 WHEN 조건2 THEN 2 ELSE 3 END ASC, 고유열 ASC;
+-- 대상 테이블: practice.products
+-- 반환 열: product_id, product_name, category
+-- product_id, product_name, category를 조회한다.
+-- ORDER BY CASE에서 Electronics는 1, Books는 2, 나머지는 ELSE 3을 반환한다.
+-- CASE 결과를 오름차순으로 정렬해 Electronics, Books, 나머지 순서로 배치한다.
+-- 같은 우선순위 안에서는 product_id를 오름차순으로 정렬한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

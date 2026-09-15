@@ -1,0 +1,11 @@
+-- T4 · 재고 금액 별칭으로 정렬
+-- 한 줄 개념: SELECT에서 만든 별칭을 ORDER BY의 정렬 기준으로 사용할 수 있습니다.
+-- 문법 틀: SELECT 열이름들, 계산식 AS 새이름 FROM 테이블명 ORDER BY 새이름 DESC, 고유열 ASC;
+-- 대상 테이블: practice.products
+-- 반환 열: product_id, product_name, inventory_value
+-- product_id와 product_name을 조회한다.
+-- price와 stock_quantity를 곱한 결과 열 이름을 inventory_value로 붙인다.
+-- inventory_value를 내림차순으로 정렬한다.
+-- inventory_value가 같으면 product_id를 오름차순으로 정렬한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

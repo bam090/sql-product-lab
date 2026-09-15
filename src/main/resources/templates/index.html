@@ -13,7 +13,7 @@
   <header class="topbar"><a href="/" class="brand">작은 상점 <span>SQL 실험실</span></a><span id="connection" class="status">연결 확인 중</span></header>
   <div class="layout">
     <aside tabindex="0" aria-label="연습 문제와 SQL 참고">
-      <p class="eyebrow">2026.09.14 · SQL 복습</p>
+      <p class="eyebrow">2026.09.14–15 · SQL 복습</p>
       <h1>조건을 쓰고,<br>결과를 확인해요.</h1>
       <p class="muted">상품 20개로 연습하는 조회와 결과 가공.<br>이번에는 SQL만 직접 작성하면 돼요.</p>
       <nav id="exercises" aria-label="연습 문제"></nav>
@@ -36,6 +36,11 @@
               <tr><td><code>IS NULL<br>IS NOT NULL</code></td><td><code>NULL</code> 여부 · 빈 문자열과 다름</td></tr>
               <tr><td><code>ORDER BY 열 ASC / DESC</code></td><td>열 기준 오름/내림차순</td></tr>
               <tr><td><code>LIMIT 개수</code></td><td>반환 행 수 제한 · 순서는 <code>ORDER BY</code>와 함께</td></tr>
+              <tr><td><code>CASE WHEN 조건<br>THEN 값 ELSE 값 END</code></td><td>조건에 따라 결과 값 만들기</td></tr>
+              <tr><td><code>값 || ' ' || 값</code></td><td>문자열 이어 붙이기</td></tr>
+              <tr><td><code>COUNT(*)<br>GROUP BY 열</code></td><td>같은 값끼리 묶어 행 수 세기</td></tr>
+              <tr><td><code>JOIN 테이블 ON 조건</code></td><td>조건이 맞는 두 테이블의 행 연결</td></tr>
+              <tr><td><code>LEFT JOIN</code></td><td>연결 대상이 없어도 왼쪽 행 유지</td></tr>
             </tbody>
           </table>
         </div>
@@ -60,6 +65,8 @@
               <span id="schema-count" class="muted"></span>
             </div>
             <p id="schema-description" class="muted"></p>
+            <label id="table-choice-label" for="table-choice" hidden>확인할 테이블</label>
+            <select id="table-choice" class="secondary source-button" hidden></select>
             <div class="table-scroll schema-table">
               <table>
                 <thead><tr><th>컬럼명</th><th>타입</th><th>뜻</th></tr></thead>
@@ -126,7 +133,7 @@
         </div>
         <button id="close-source" class="dialog-close" type="button" aria-label="원본 테이블 닫기">×</button>
       </header>
-      <p class="muted">연습에 사용하는 상품 데이터를 <code>product_id</code> 순서로 보여줍니다.</p>
+      <p id="source-description" class="muted">선택한 테이블의 원본 데이터를 보여줍니다.</p>
       <p id="source-status" class="muted" role="status"></p>
       <p id="source-error" role="alert" hidden></p>
       <div id="source-result" class="table-scroll source-result"></div>

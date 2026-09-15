@@ -55,6 +55,8 @@ nav { margin-top: 30px; }
 .schema-table th, .schema-table td { padding: 8px 7px; vertical-align: top; overflow-wrap: anywhere; }
 .schema-table td:first-child { white-space: nowrap; overflow-wrap: normal; }
 .source-button { width: 100%; margin-top: 20px; }
+#table-choice { margin: 6px 0 18px; padding: 9px; font: inherit; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: white; }
+#table-choice-label { font-size: 12px; color: var(--muted); }
 .work-panel { min-width: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .problem-panel { min-height: 218px; padding: 25px 28px; border-bottom: 1px solid var(--line); }
 .problem-panel h3 { font-size: 20px; }

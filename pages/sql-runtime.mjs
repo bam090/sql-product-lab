@@ -116,7 +116,10 @@ export function starterSql(exercise, schema) {
   const lines = [`-- ${exercise.id} · ${exercise.title}`];
   if (exercise.concept) lines.push(`-- 한 줄 개념: ${exercise.concept}`);
   if (exercise.syntaxFrame) lines.push(`-- 문법 틀: ${exercise.syntaxFrame}`);
-  if (schema?.name && schema?.table) lines.push(`-- 대상 테이블: ${schema.name}.${schema.table}`);
+  if (schema?.name && schema?.table) {
+    const tables = exercise.tables || [schema.table];
+    lines.push(`-- 대상 테이블: ${tables.map(table => `${schema.name}.${table}`).join(', ')}`);
+  }
   lines.push(`-- 반환 열: ${exercise.columns.join(', ')}`);
   for (const requirement of exercise.requirements) lines.push(`-- ${requirement}`);
   lines.push('', '-- TODO: 아래에 SELECT 문 하나를 작성하세요.', '');

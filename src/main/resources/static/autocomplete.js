@@ -2,16 +2,21 @@
   const KEYWORDS = [
     'SELECT', 'FROM', 'AS', 'DISTINCT', 'WHERE', 'AND', 'OR', 'IN', 'LIKE',
     'LOWER', 'TRIM', 'IS', 'NOT', 'NULL', 'BETWEEN', 'ORDER BY', 'BY', 'ASC',
-    'DESC', 'ROUND', 'LIMIT'
+    'DESC', 'ROUND', 'LIMIT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END',
+    'GROUP BY', 'COUNT', 'SUM', 'AVG', 'JOIN', 'INNER', 'LEFT', 'RIGHT',
+    'FULL', 'OUTER', 'CROSS', 'ON', 'USING', 'EXISTS', 'UNION ALL', 'COALESCE'
   ];
 
   function createCandidates(schema) {
-    const table = schema.name + '.' + schema.table;
-    return [
+    const schemas = Array.isArray(schema) ? schema : [schema];
+    const candidates = [
       ...KEYWORDS.map((value) => ({ value, kind: '키워드' })),
-      { value: table, kind: '테이블' },
-      ...schema.columns.map((column) => ({ value: column.name, kind: '컬럼' }))
+      ...schemas.flatMap((item) => [
+        { value: item.name + '.' + item.table, kind: '테이블' },
+        ...item.columns.map((column) => ({ value: column.name, kind: '컬럼' }))
+      ])
     ];
+    return [...new Map(candidates.map((candidate) => [candidate.value, candidate])).values()];
   }
 
   function dollarDelimiterAt(sql, start) {

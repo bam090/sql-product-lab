@@ -1,0 +1,11 @@
+-- J7 · 가격을 가격 밴드에 연결
+-- 한 줄 개념: JOIN의 ON에는 등호뿐 아니라 BETWEEN 같은 범위 조건도 쓸 수 있습니다.
+-- 문법 틀: SELECT 열들 FROM 테이블1 JOIN 테이블2 ON 값열 BETWEEN 최솟값열 AND 최댓값열;
+-- 대상 테이블: practice.products, practice.price_bands
+-- 반환 열: product_id, product_name, price, band_id, band_name
+-- product price가 price_bands의 min_price 이상 max_price 이하인 행을 연결한다.
+-- BETWEEN을 ON 절에 사용한다.
+-- 가격 밴드 구간이 겹치므로 한 상품이 여러 밴드에 나타날 수 있다.
+-- product_id, band_id 순서로 오름차순 정렬한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

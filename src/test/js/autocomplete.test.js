@@ -72,7 +72,19 @@ test('completes ORDER BY as one phrase without adding an answer or condition', (
     assert.equal(autocomplete.applyCompletion(sql, match.range, match.items[0].value).text,
       'SELECT * FROM practice.products ORDER BY');
   }
-  assert.deepEqual(candidates.filter((candidate) => /\s/.test(candidate.value)).map((item) => item.value), ['ORDER BY']);
+  assert.deepEqual(candidates.filter((candidate) => /\s/.test(candidate.value)).map((item) => item.value), ['ORDER BY', 'GROUP BY', 'UNION ALL']);
   assert.equal(candidates.some((candidate) => candidate.value.includes('=')), false);
   assert.equal(markedCompletion('SELECT|'), null);
+});
+
+test('completes grouping and join syntax with columns from both tables', () => {
+  const joined = autocomplete.createCandidates([schema, { name: 'practice', table: 'categories', columns: [{name: 'category'}, {name: 'category_name'}] }]);
+  const sql = 'SELECT category, COUNT(*) FROM practice.products GRO';
+  const match = autocomplete.completions(sql, sql.length, joined);
+  assert.equal(autocomplete.applyCompletion(sql, match.range, match.items[0].value).text,
+    'SELECT category, COUNT(*) FROM practice.products GROUP BY');
+  assert.equal(joined.filter((item) => item.value === 'category').length, 1);
+  for (const value of ['CASE', 'WHEN', 'COUNT', 'JOIN', 'ON', 'practice.categories', 'category_name']) {
+    assert.ok(joined.some((item) => item.value === value), value);
+  }
 });

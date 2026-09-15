@@ -3,13 +3,31 @@ let catalog, current, dirty = false, busy = false, selectionRevision = 0;
 let sourceDialogTrigger = null, sourceRevision = 0;
 let autocompleteCandidates = [], autocompleteMatch = null, autocompleteIndex = 0, composing = false, tabMovesFocus = false;
 const drafts = new Map();
-const SOURCE_TABLE_SQL = 'SELECT * FROM practice.products ORDER BY product_id';
-const BRANCH_LABELS = {
-  'warmup': '00 한 단계씩 SQL 시작하기',
-  'codex/select': '01 열 선택과 결과 가공',
-  'codex/filters': '02 조건으로 상품 찾기',
-  'codex/integration': '03 종합 조회'
+let currentSchema;
+const CATEGORY_LABELS = {
+  'select': '01 SELECT · 열과 결과 만들기',
+  'where': '02 WHERE · 조건으로 고르기',
+  'order-by': '03 ORDER BY · 순서 정하기',
+  'joins': '04 JOIN · 테이블 연결하기'
 };
+function exerciseCategory(exercise) {
+  return exercise.category || (exercise.branch === 'codex/filters' ? 'where' : 'select');
+}
+function exerciseSchemas(exercise) {
+  const schemas = [catalog.schema, ...(catalog.schemas || [])];
+  return exercise.tables ? schemas.filter((schema) => exercise.tables.includes(schema.table)) : [catalog.schema];
+}
+function showSchema(schema) {
+  currentSchema = schema;
+  $('schema-title').textContent = `${schema.name}.${schema.table}`;
+  $('schema-description').textContent = schema.description;
+  $('schema-count').textContent = `${schema.seedRowCount}행`;
+  $('schema').replaceChildren(...schema.columns.map((column) => {
+    const row = document.createElement('tr');
+    [column.name, column.type, column.description].forEach((value) => row.append(cell('td', value)));
+    return row;
+  }));
+}
 async function api(path, options = {}) {
   if (window.SqlLabPagesApi) return window.SqlLabPagesApi(path, options);
   let response;
@@ -145,7 +163,17 @@ async function select(exercise) {
   current = exercise;
   selectionRevision++;
   $('sql').readOnly = true; $('run').disabled = true; $('save').disabled = true;
-  $('topic-title').textContent = BRANCH_LABELS[exercise.branch] || '상품 조회 SQL 연습';
+  $('topic-title').textContent = CATEGORY_LABELS[exerciseCategory(exercise)] || '상품 조회 SQL 연습';
+  const schemas = exerciseSchemas(exercise);
+  $('table-choice').replaceChildren(...schemas.map((schema) => {
+    const option = cell('option', `${schema.name}.${schema.table}`);
+    option.value = schema.table;
+    return option;
+  }));
+  $('table-choice-label').hidden = schemas.length < 2;
+  $('table-choice').hidden = schemas.length < 2;
+  showSchema(schemas[0]);
+  autocompleteCandidates = SqlAutocomplete.createCandidates(schemas);
   $('title').textContent = exercise.title;
   $('step').textContent = `${exercise.id} / ${exercise.optional ? '선택 연습' : '핵심 연습'}`;
   $('minutes').textContent = `약 ${exercise.minutes}분`;
@@ -229,11 +257,15 @@ async function openSourceTable() {
   const dialog = $('source-dialog');
   const revision = ++sourceRevision;
   const exerciseId = current.id;
+  const schema = currentSchema;
+  const sourceSql = `SELECT * FROM ${schema.name}.${schema.table} ORDER BY ${schema.columns[0].name}`;
+  $('source-dialog-title').textContent = `원본 테이블 · ${schema.name}.${schema.table}`;
+  $('source-description').textContent = `${schema.columns[0].name} 순서로 보여줍니다.`;
   sourceDialogTrigger = $('open-source');
   $('source-error').hidden = true;
   $('source-error').textContent = '';
   $('source-status').textContent = '원본 테이블을 불러오고 있어요…';
-  const loading = cell('p', '실제 데이터베이스에서 상품 데이터를 조회하는 중입니다.');
+  const loading = cell('p', '선택한 테이블을 조회하는 중입니다.');
   loading.className = 'empty';
   $('source-result').replaceChildren(loading);
   dialog.setAttribute('aria-busy', 'true');
@@ -242,7 +274,7 @@ async function openSourceTable() {
     const result = await api('/api/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ exerciseId, sql: SOURCE_TABLE_SQL })
+      body: JSON.stringify({ exerciseId, sql: sourceSql })
     });
     if (revision !== sourceRevision || !dialog.open) return;
     table($('source-result'), result.columns, result.rows);
@@ -258,6 +290,9 @@ async function openSourceTable() {
   }
 }
 $('open-source').addEventListener('click', openSourceTable);
+$('table-choice').addEventListener('change', () => {
+  showSchema(exerciseSchemas(current).find((schema) => schema.table === $('table-choice').value));
+});
 $('close-source').addEventListener('click', () => $('source-dialog').close());
 $('source-dialog').addEventListener('click', (e) => {
   const dialog = $('source-dialog');
@@ -274,18 +309,15 @@ window.addEventListener('beforeunload', (e) => { if (dirty || drafts.size) { e.p
 async function init() {
   try {
     catalog = await api('/api/exercises');
-    autocompleteCandidates = SqlAutocomplete.createCandidates(catalog.schema);
-    $('schema-description').textContent = catalog.schema.description;
-    $('schema-count').textContent = `${catalog.schema.seedRowCount}행`;
-    catalog.schema.columns.forEach((c) => { const tr = document.createElement('tr'); [c.name,c.type,c.description].forEach((v) => tr.append(cell('td',v))); $('schema').append(tr); });
     let previous = '', groupList;
-    const order = ['warmup', 'codex/select', 'codex/filters', 'codex/integration'];
-    [...catalog.exercises].sort((a, b) => order.indexOf(a.branch) - order.indexOf(b.branch)).forEach((e) => {
-      if (e.branch !== previous) {
+    const order = Object.keys(CATEGORY_LABELS);
+    [...catalog.exercises].sort((a, b) => order.indexOf(exerciseCategory(a)) - order.indexOf(exerciseCategory(b))).forEach((e) => {
+      const category = exerciseCategory(e);
+      if (category !== previous) {
         const group = document.createElement('details');
         group.className = 'exercise-group';
-        group.open = e.branch === catalog.exercises[0].branch;
-        const summary = cell('summary', BRANCH_LABELS[e.branch] || e.branch);
+        group.open = category === exerciseCategory(catalog.exercises[0]);
+        const summary = cell('summary', CATEGORY_LABELS[category] || category);
         summary.className = 'group-label';
         groupList = document.createElement('div');
         groupList.className = 'exercise-list';
@@ -294,7 +326,7 @@ async function init() {
           if (group.open) document.querySelectorAll('.exercise-group').forEach((other) => { if (other !== group) other.open = false; });
         });
         $('exercises').append(group);
-        previous = e.branch;
+        previous = category;
       }
       const b = document.createElement('button'); b.className = 'exercise'; b.dataset.id = e.id; b.append(cell('span', e.id), document.createTextNode(e.title)); b.addEventListener('click', () => select(e)); groupList.append(b);
     });

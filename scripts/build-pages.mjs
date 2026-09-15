@@ -10,7 +10,9 @@ for (const file of ['autocomplete.js', 'result-comparison.js', 'lab.js', 'style.
   await cp(new URL(`../src/main/resources/static/${file}`, import.meta.url), new URL(file, output));
 }
 await cp(new URL('../exercises.json', import.meta.url), new URL('exercises.json', output));
-await cp(new URL('../setup/seed.sql', import.meta.url), new URL('seed.sql', output));
+const seedParts = await Promise.all(['seed.sql', 'join-seed.sql'].map(file =>
+  readFile(new URL(`../setup/${file}`, import.meta.url), 'utf8')));
+await writeFile(new URL('seed.sql', output), seedParts.join('\n'));
 for (const file of ['pglite.wasm', 'initdb.wasm', 'pglite.data']) {
   await cp(new URL(`../node_modules/@electric-sql/pglite/dist/${file}`, import.meta.url), new URL(file, output));
 }

@@ -1,0 +1,11 @@
+-- T6 · NULL 설명을 마지막으로 정렬
+-- 한 줄 개념: CASE로 NULL 여부를 숫자로 바꾸면 NULL인 행을 마지막에 배치할 수 있습니다.
+-- 문법 틀: SELECT 열이름들 FROM 테이블명 ORDER BY CASE WHEN 열이름 IS NULL THEN 1 ELSE 0 END ASC, 고유열 ASC;
+-- 대상 테이블: practice.products
+-- 반환 열: product_id, product_name, description
+-- product_id, product_name, description을 조회한다.
+-- description이 NULL이면 1, 아니면 ELSE 0을 반환하는 CASE를 정렬 기준으로 사용한다.
+-- CASE 결과를 오름차순으로 정렬해 NULL인 행을 마지막에 배치한다.
+-- NULL 여부가 같으면 product_id를 오름차순으로 정렬한다. 빈 문자열은 NULL이 아니다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.

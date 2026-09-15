@@ -1,6 +1,6 @@
 # 작은 상점 SQL 실험실
 
-상품 20개로 `SELECT` 조회와 조건식을 직접 연습하는 작은 실험실입니다.
+상품 20개와 카테고리·가격대 표로 SQL을 연습하는 작은 실험실입니다.
 
 정답 SQL은 보여주지 않고, 힌트와 기대 결과로 풀이를 확인합니다.
 
@@ -21,12 +21,16 @@
 
 각 문제의 요구사항은 실습 화면과 [SQL 파일](sql)에서 확인할 수 있습니다.
 
-| 단계 | 문제 | 다루는 내용 |
-| --- | --- | --- |
-| 기초 16문제 | B1–B16 | 열 선택, 별칭, 문자열, 정렬, 중복 제거, WHERE, AND/OR, IN, BETWEEN, LIKE, NULL, LIMIT |
-| 응용·종합 10문제 | S1–S3, F1–F4, I1, O1–O2 | 계산과 반올림, 여러 조건, 날짜 범위, 빈 값, 결과 열 만들기, 대소문자 검색 |
+| 화면 분류 | 다루는 내용 |
+| --- | --- |
+| SELECT | 열 선택, 별칭, 문자열, 계산, CASE, GROUP BY·COUNT |
+| WHERE | AND/OR, IN, BETWEEN, LIKE, NULL, 여러 조건 조합 |
+| ORDER BY | 오름차순·내림차순, 여러 정렬 기준, 별칭, NULL 위치 |
+| JOIN | INNER·LEFT·SELF·CROSS·FULL, USING, 연결 후 개수 세기, 가격 범위 연결 |
 
-`practice.products` 테이블 하나를 사용합니다. SQL 파일의 요구사항 주석 아래에 SELECT 문 하나만 작성하세요.
+총 **42문제**입니다. 기본 문제부터 골라 풀고 각 분류는 접고 펼칠 수 있어요. 브랜치를 바꿀 필요는 없습니다.
+
+JOIN에서는 왼쪽의 **확인할 테이블**을 바꿔 구조를 살펴보고 **원본 테이블 보기**로 데이터를 확인하세요. SQL 파일에서는 요구사항 주석 아래에 SELECT 문 하나를 작성합니다.
 
 ## 저장과 브라우저 안내
 
@@ -55,19 +59,26 @@ IntelliJ를 쓴다면 프로젝트 루트를 열고 Project SDK와 Gradle JVM을
 
 1. 연습 전용 Supabase 프로젝트를 준비합니다.
 2. SQL Editor에서 [setup/seed.sql](setup/seed.sql)을 **한 번만** 실행해 `practice.products`와 상품 20개를 만듭니다. 테이블이 이미 있다면 다시 실행하지 마세요.
-3. 같은 SQL Editor에서 조회 전용 계정과 RLS 정책을 만듭니다. 비밀번호는 직접 정하세요.
+3. [setup/join-seed.sql](setup/join-seed.sql)을 실행해 카테고리·가격대 표를 추가합니다. 기존 상품 데이터는 바뀌지 않습니다.
+4. 같은 SQL Editor에서 조회 전용 계정과 RLS 정책을 만듭니다. 비밀번호는 직접 정하세요.
 
 ```sql
 CREATE ROLE practice_reader LOGIN PASSWORD '본인이_정한_비밀번호';
 GRANT USAGE ON SCHEMA practice TO practice_reader;
-GRANT SELECT ON practice.products TO practice_reader;
+GRANT SELECT ON practice.products, practice.categories, practice.price_bands TO practice_reader;
 ALTER TABLE practice.products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY practice_reader_select ON practice.products
     FOR SELECT TO practice_reader USING (true);
+ALTER TABLE practice.categories ENABLE ROW LEVEL SECURITY;
+CREATE POLICY practice_reader_select ON practice.categories
+    FOR SELECT TO practice_reader USING (true);
+ALTER TABLE practice.price_bands ENABLE ROW LEVEL SECURITY;
+CREATE POLICY practice_reader_select ON practice.price_bands
+    FOR SELECT TO practice_reader USING (true);
 ```
 
-4. [config/local.properties.example](config/local.properties.example)을 같은 폴더에 `local.properties`로 복사합니다.
-5. Supabase **Connect → Session pooler**에서 호스트와 프로젝트 참조값을 확인해 아래 값을 채웁니다.
+5. [config/local.properties.example](config/local.properties.example)을 같은 폴더에 `local.properties`로 복사합니다.
+6. Supabase **Connect → Session pooler**에서 호스트와 프로젝트 참조값을 확인해 아래 값을 채웁니다.
 
 ```properties
 lab.database.url=jdbc:postgresql://POOLER_HOST:5432/postgres

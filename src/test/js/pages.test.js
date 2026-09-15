@@ -9,17 +9,20 @@ const setup = Promise.all([
   import('@electric-sql/pglite'),
   import('../../../pages/sql-runtime.mjs'),
   readFile(path.join(root, 'exercises.json'), 'utf8').then(JSON.parse),
-  readFile(path.join(root, 'setup/seed.sql'), 'utf8')
+  Promise.all(['seed.sql', 'join-seed.sql'].map(file => readFile(path.join(root, 'setup', file), 'utf8')))
+    .then(parts => parts.join('\n'))
 ]);
 
 test('Pages starters are generated from the catalog without local answer files', async () => {
   const [, { starterSql }, catalog] = await setup;
-  assert.equal(catalog.exercises.length, 26);
+  assert.equal(new Set(catalog.exercises.map(exercise => exercise.id)).size, catalog.exercises.length);
+  assert.deepEqual([...new Set(catalog.exercises.map(exercise => exercise.category))].sort(), ['joins', 'order-by', 'select', 'where']);
   for (const exercise of catalog.exercises) {
     const sql = starterSql(exercise, catalog.schema);
     assert.match(sql, new RegExp(`^-- ${exercise.id} ·`));
     assert.match(sql, /-- TODO:/);
     assert.doesNotMatch(sql, /^(?!\s*--).*\bSELECT\b/im);
+    for (const table of exercise.tables || [catalog.schema.table]) assert.ok(sql.includes(`practice.${table}`));
   }
 });
 

@@ -1,0 +1,11 @@
+-- J3 · 카테고리별 상품 수 세기
+-- 한 줄 개념: LEFT JOIN 뒤 매칭된 키를 COUNT하면 빈 그룹을 0으로 셀 수 있습니다.
+-- 문법 틀: SELECT 그룹열, COUNT(오른쪽테이블.키) FROM 왼쪽테이블 LEFT JOIN 오른쪽테이블 ON 조건 GROUP BY 그룹열;
+-- 대상 테이블: practice.categories, practice.products
+-- 반환 열: category, category_name, product_count
+-- categories에서 시작해 products를 category로 LEFT JOIN한다.
+-- 모든 카테고리를 category와 category_name으로 그룹화한다.
+-- COUNT(*)가 아니라 COUNT(product_id)로 상품 수를 세고 product_count로 반환한다.
+-- product_count 내림차순, category 오름차순으로 정렬한다.
+
+-- TODO: 아래에 SELECT 문 하나를 작성하세요.
