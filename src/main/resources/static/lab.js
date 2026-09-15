@@ -116,7 +116,34 @@ function selectAutocomplete(index) {
   });
   const active = $(`sql-suggestion-${autocompleteIndex}`);
   $('sql').setAttribute('aria-activedescendant', active.id);
-  active.scrollIntoView({ block: 'nearest' });
+  const list = $('sql-suggestions');
+  const top = active.offsetTop, bottom = top + active.offsetHeight;
+  if (top < list.scrollTop) list.scrollTop = top;
+  else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight;
+}
+function positionAutocomplete() {
+  const editor = $('sql'), list = $('sql-suggestions');
+  if (list.hidden) return;
+  const style = getComputedStyle(editor);
+  // Measure wrapping with the textarea's actual font, padding and available text width.
+  const mirror = document.createElement('div');
+  for (const key of ['font', 'letterSpacing', 'lineHeight', 'padding', 'border', 'boxSizing', 'tabSize', 'textIndent']) mirror.style[key] = style[key];
+  Object.assign(mirror.style, { position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden', whiteSpace: 'pre-wrap', overflowWrap: 'break-word',
+    width: (editor.clientWidth + parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth)) + 'px' });
+  mirror.textContent = editor.value.slice(0, editor.selectionStart);
+  const marker = document.createElement('span');
+  marker.textContent = editor.value.slice(editor.selectionStart) || '.';
+  mirror.append(marker);
+  document.body.append(mirror);
+  const markerRect = marker.getClientRects()[0], mirrorRect = mirror.getBoundingClientRect();
+  const x = markerRect.left - mirrorRect.left - editor.scrollLeft;
+  const y = markerRect.top - mirrorRect.top - editor.scrollTop;
+  mirror.remove();
+  const editorRect = editor.getBoundingClientRect(), wrapRect = editor.parentElement.getBoundingClientRect();
+  if (y < 0 || y > editor.clientHeight) { closeAutocomplete(); return; }
+  const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.8;
+  list.style.left = Math.max(0, Math.min(editorRect.left - wrapRect.left + x, editor.parentElement.clientWidth - list.offsetWidth)) + 'px';
+  list.style.top = (editorRect.top - wrapRect.top + y + lineHeight + 4) + 'px';
 }
 function renderAutocomplete(match) {
   autocompleteMatch = match;
@@ -137,6 +164,7 @@ function renderAutocomplete(match) {
   });
   $('sql-suggestions').replaceChildren(...options);
   $('sql-suggestions').hidden = false;
+  positionAutocomplete();
   $('sql').setAttribute('aria-expanded', 'true');
   $('sql').setAttribute('aria-activedescendant', options[0].id);
 }
@@ -208,6 +236,9 @@ async function load(force) {
   finally { if (revision === selectionRevision) { $('sql').readOnly = false; $('run').disabled = false; $('save').disabled = false; } }
 }
 $('sql').addEventListener('input', () => { markSqlDirty(); if (!composing) refreshAutocomplete(); });
+$('sql').addEventListener('scroll', positionAutocomplete);
+window.addEventListener('resize', positionAutocomplete);
+new ResizeObserver(positionAutocomplete).observe($('sql'));
 $('sql').addEventListener('compositionstart', () => { composing = true; closeAutocomplete(); });
 $('sql').addEventListener('compositionend', () => { composing = false; refreshAutocomplete(); });
 $('sql').addEventListener('click', refreshAutocomplete);
