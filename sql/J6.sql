@@ -1,7 +1,7 @@
 -- J6 · 같은 카테고리의 상품 쌍 찾기
 -- 한 줄 개념: 한 테이블에 서로 다른 별칭을 붙여 self-join하면 같은 테이블의 행끼리 비교할 수 있습니다.
 -- 문법 틀: SELECT 열들 FROM 테이블 AS 별칭1 JOIN 테이블 AS 별칭2 ON 같은그룹조건 AND 별칭1.키 < 별칭2.키;
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product1_id, product1_name, product2_id, product2_name, category
 -- products에 p1과 p2라는 서로 다른 별칭을 붙여 self-join한다.
 -- category가 같은 상품끼리 연결한다.

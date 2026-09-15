@@ -1,5 +1,5 @@
 -- J8 · 상품과 카테고리 전체 대조
--- 대상 테이블: practice.categories, practice.products
+-- 대상 테이블: categories, products
 -- 반환 열: catalog_category, category_name, product_category, product_id, product_name
 -- categories와 products를 category로 명시적 FULL OUTER JOIN한다.
 -- catalog_category는 categories.category, product_category는 products.category로 반환한다.

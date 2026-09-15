@@ -1,5 +1,5 @@
 -- J7 · 가격을 가격 밴드에 연결
--- 대상 테이블: practice.products, practice.price_bands
+-- 대상 테이블: products, price_bands
 -- 반환 열: product_id, product_name, price, band_id, band_name
 -- product price가 price_bands의 min_price 이상 max_price 이하인 행을 연결한다.
 -- BETWEEN을 ON 절에 사용한다.

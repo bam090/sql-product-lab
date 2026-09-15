@@ -107,7 +107,7 @@
       "concept": "SELECT *로 테이블의 모든 열을 조회합니다.",
       "syntaxFrame": "SELECT * FROM 테이블명;",
       "requirements": [
-        "practice.products 테이블의 모든 열을 조회한다.",
+        "products 테이블의 모든 열을 조회한다.",
         "별표(*)를 사용해 전체 열을 반환한다."
       ],
       "columns": [
@@ -150,7 +150,7 @@
       "optional": false,
       "sortRequired": false,
       "orderMatters": false,
-      "schemaNote": "practice.products의 7개 열을 모두 사용합니다. 아직 정렬하지 않으므로 행 순서는 채점하지 않습니다."
+      "schemaNote": "products의 7개 열을 모두 사용합니다. 아직 정렬하지 않으므로 행 순서는 채점하지 않습니다."
     },
     {
       "id": "B2",
@@ -161,7 +161,7 @@
       "concept": "SELECT 뒤에 열 이름을 쓰면 필요한 열만 조회할 수 있습니다.",
       "syntaxFrame": "SELECT 열이름 FROM 테이블명;",
       "requirements": [
-        "practice.products에서 product_name 열 하나만 조회한다.",
+        "products에서 product_name 열 하나만 조회한다.",
         "반환 열 이름은 product_name이다."
       ],
       "columns": [
@@ -208,7 +208,7 @@
       "concept": "여러 열 이름을 쉼표로 구분해 함께 조회합니다.",
       "syntaxFrame": "SELECT 열1, 열2 FROM 테이블명;",
       "requirements": [
-        "practice.products에서 product_name과 price를 조회한다.",
+        "products에서 product_name과 price를 조회한다.",
         "반환 열 순서는 product_name, price이다."
       ],
       "columns": [
@@ -257,7 +257,7 @@
       "concept": "AS로 조회 결과의 열 이름을 바꿉니다.",
       "syntaxFrame": "SELECT 열이름 AS 새이름 FROM 테이블명;",
       "requirements": [
-        "practice.products에서 product_name을 조회한다.",
+        "products에서 product_name을 조회한다.",
         "AS를 사용해 반환 열 이름을 name으로 바꾼다."
       ],
       "columns": [
@@ -334,7 +334,7 @@
       "concept": "ORDER BY로 조회 결과를 오름차순 정렬합니다.",
       "syntaxFrame": "SELECT 열이름 FROM 테이블명 ORDER BY 열이름 ASC;",
       "requirements": [
-        "practice.products에서 product_name 열 하나만 조회한다.",
+        "products에서 product_name 열 하나만 조회한다.",
         "product_name 오름차순으로 정렬한다."
       ],
       "columns": [
@@ -382,7 +382,7 @@
       "concept": "DISTINCT로 같은 값을 한 번씩만 조회합니다.",
       "syntaxFrame": "SELECT DISTINCT 열이름 FROM 테이블명;",
       "requirements": [
-        "practice.products의 category를 조회한다.",
+        "products의 category를 조회한다.",
         "DISTINCT로 중복 카테고리를 제거한다."
       ],
       "columns": [
@@ -2559,7 +2559,7 @@
         [11, "SQL Basics", "도서", 28.0]
       ],
       "hints": [
-        "INNER JOIN practice.categories",
+        "INNER JOIN categories",
         "ON products.category = categories.category",
         "WHERE products.category = 'Books'"
       ],
@@ -2602,7 +2602,7 @@
         [16, "Coffee Beans", 18.0, null, null, null]
       ],
       "hints": [
-        "LEFT JOIN practice.products AS higher",
+        "LEFT JOIN products AS higher",
         "같은 category와 더 큰 price를 ON에 함께 쓰기",
         "WHERE p.category = 'Food'"
       ],

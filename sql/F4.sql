@@ -1,5 +1,5 @@
 -- F4 · 9월 출시 범위 검색
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, released_at
 -- 2026-09-01 00:00:00 이상을 포함한다.
 -- 2026-10-01 00:00:00 미만만 포함한다.

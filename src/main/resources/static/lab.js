@@ -20,7 +20,7 @@ function exerciseSchemas(exercise) {
 }
 function showSchema(schema) {
   currentSchema = schema;
-  $('schema-title').textContent = `${schema.name}.${schema.table}`;
+  $('schema-title').textContent = schema.table;
   $('schema-description').textContent = schema.description;
   $('schema-count').textContent = `${schema.seedRowCount}행`;
   $('schema').replaceChildren(...schema.columns.map((column) => {
@@ -195,7 +195,7 @@ async function select(exercise) {
   $('topic-title').textContent = CATEGORY_LABELS[exerciseCategory(exercise)] || '상품 조회 SQL 연습';
   const schemas = exerciseSchemas(exercise);
   $('table-choice').replaceChildren(...schemas.map((schema) => {
-    const option = cell('option', `${schema.name}.${schema.table}`);
+    const option = cell('option', schema.table);
     option.value = schema.table;
     return option;
   }));
@@ -299,7 +299,7 @@ async function openSourceTable() {
   const exerciseId = current.id;
   const schema = currentSchema;
   const sourceSql = `SELECT * FROM ${schema.name}.${schema.table} ORDER BY ${schema.columns[0].name}`;
-  $('source-dialog-title').textContent = `원본 테이블 · ${schema.name}.${schema.table}`;
+  $('source-dialog-title').textContent = `원본 테이블 · ${schema.table}`;
   $('source-description').textContent = `${schema.columns[0].name} 순서로 보여줍니다.`;
   sourceDialogTrigger = $('open-source');
   $('source-error').hidden = true;

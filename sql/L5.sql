@@ -1,7 +1,7 @@
 -- L5 · 출시 시각 구간을 작은 배치로 읽기
 -- 한 줄 개념: 하한은 제외하고 상한은 포함하는 범위 조건과 오름차순 정렬로 처리 구간을 겹치지 않게 읽을 수 있습니다.
 -- 문법 틀: SELECT 열들 FROM 테이블명 WHERE 시간열 > 하한 AND 시간열 <= 상한 ORDER BY 시간열 ASC, 고유열 ASC LIMIT 개수;
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, released_at
 -- product_id, product_name, released_at을 조회한다.
 -- 2026-09-01 00:00:00은 제외하고 2026-09-15 00:00:00은 포함하는 출시 시각 범위를 사용한다.
