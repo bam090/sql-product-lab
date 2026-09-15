@@ -164,3 +164,25 @@ test('editor keys confirm suggestions, indent without suggestions, and respect c
   assert.deepEqual(press('Tab'), {calls: [], prevented: false});
   assert.deepEqual(press('Enter', {ctrlKey: true}), {calls: [['close'], ['run']], prevented: true});
 });
+
+test('moving the caret refreshes an open popup while up/down keeps candidate navigation', () => {
+  const fs = require('node:fs'), vm = require('node:vm');
+  const source = fs.readFileSync(require('node:path').join(__dirname, '../../main/resources/static/lab.js'), 'utf8');
+  let handler, refreshes = 0;
+  const context = vm.createContext({
+    $: () => ({addEventListener: (_, fn) => {handler = fn;}}),
+    composing: false, autocompleteMatch: {items: [{value: 'practice.products'}]},
+    refreshAutocomplete: () => refreshes++
+  });
+  const start = source.indexOf("$('sql').addEventListener('keyup'");
+  vm.runInContext(source.slice(start, source.indexOf('async function openSourceTable()', start)), context);
+  for (const key of ['ArrowLeft', 'ArrowRight', 'Home', 'End']) handler({key});
+  assert.equal(refreshes, 4);
+  for (const key of ['ArrowUp', 'ArrowDown', 'Enter', 'Tab']) handler({key});
+  assert.equal(refreshes, 4);
+  handler({key: 'ArrowLeft', isComposing: true});
+  assert.equal(refreshes, 4);
+  context.autocompleteMatch = null;
+  handler({key: 'ArrowUp'});
+  assert.equal(refreshes, 5);
+});

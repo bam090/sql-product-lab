@@ -288,7 +288,9 @@ $('sql').addEventListener('keydown', (e) => {
   else if (e.key === 'Enter') { e.preventDefault(); acceptAutocomplete(autocompleteIndex); }
 });
 $('sql').addEventListener('keyup', (e) => {
-  if (!composing && !autocompleteMatch && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) refreshAutocomplete();
+  if (composing || e.isComposing) return;
+  if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)
+      || (!autocompleteMatch && ['ArrowUp', 'ArrowDown'].includes(e.key))) refreshAutocomplete();
 });
 async function openSourceTable() {
   if (!current) return;
