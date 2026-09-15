@@ -311,9 +311,10 @@ async function init() {
   try {
     catalog = await api('/api/exercises');
     for (const [level, label] of Object.entries(LEVEL_LABELS)) {
-      const section = document.createElement('section');
+      const section = document.createElement('details');
       section.className = 'exercise-level';
-      const heading = cell('h2', label);
+      section.open = level === (catalog.exercises[0].level || 'basic');
+      const heading = cell('summary', label);
       heading.id = `level-${level}`;
       section.setAttribute('aria-labelledby', heading.id);
       section.append(heading);

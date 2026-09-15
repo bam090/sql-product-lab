@@ -32,6 +32,9 @@ test('navigation renders two levels with four categories and keeps every exercis
   vm.runInContext(source.slice(source.indexOf('async function init()')).replace(/init\(\);\s*$/, ''), context);
   await context.init();
   const sections = nodes.get('exercises').children;
+  assert.deepEqual(sections.map(section => section.tag), ['details', 'details']);
+  assert.deepEqual(sections.map(section => section.children[0].tag), ['summary', 'summary']);
+  assert.deepEqual(sections.map(section => section.open), [true, false]);
   assert.deepEqual(sections.map(section => section.children[0].textContent), ['기본 개념 문제', '응용 문제']);
   const buttons = [];
   for (const section of sections) {
