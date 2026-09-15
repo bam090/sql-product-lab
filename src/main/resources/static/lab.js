@@ -4,6 +4,7 @@ let sourceDialogTrigger = null, sourceRevision = 0;
 let autocompleteCandidates = [], autocompleteMatch = null, autocompleteIndex = 0, composing = false, tabMovesFocus = false;
 const drafts = new Map();
 let currentSchema;
+const LEVEL_LABELS = { basic: '기본 개념 문제', applied: '응용 문제' };
 const CATEGORY_LABELS = {
   'select': '01 SELECT · 열과 결과 만들기',
   'where': '02 WHERE · 조건으로 고르기',
@@ -175,7 +176,7 @@ async function select(exercise) {
   showSchema(schemas[0]);
   autocompleteCandidates = SqlAutocomplete.createCandidates(schemas);
   $('title').textContent = exercise.title;
-  $('step').textContent = `${exercise.id} / ${exercise.optional ? '선택 연습' : '핵심 연습'}`;
+  $('step').textContent = `${exercise.id} / ${LEVEL_LABELS[exercise.level] || '기본 개념 문제'}${exercise.optional ? ' · 선택 연습' : ''}`;
   $('minutes').textContent = `약 ${exercise.minutes}분`;
   $('filename').textContent = window.SqlLabPagesApi ? `브라우저 저장 · ${exercise.id}` : `sql/${exercise.id}.sql`;
   $('requirements').replaceChildren(...exercise.requirements.map((r) => cell('li', r)));
@@ -309,27 +310,34 @@ window.addEventListener('beforeunload', (e) => { if (dirty || drafts.size) { e.p
 async function init() {
   try {
     catalog = await api('/api/exercises');
-    let previous = '', groupList;
-    const order = Object.keys(CATEGORY_LABELS);
-    [...catalog.exercises].sort((a, b) => order.indexOf(exerciseCategory(a)) - order.indexOf(exerciseCategory(b))).forEach((e) => {
-      const category = exerciseCategory(e);
-      if (category !== previous) {
+    for (const [level, label] of Object.entries(LEVEL_LABELS)) {
+      const section = document.createElement('section');
+      section.className = 'exercise-level';
+      const heading = cell('h2', label);
+      heading.id = `level-${level}`;
+      section.setAttribute('aria-labelledby', heading.id);
+      section.append(heading);
+      for (const [category, categoryLabel] of Object.entries(CATEGORY_LABELS)) {
+        const exercises = catalog.exercises.filter(e => (e.level || 'basic') === level && exerciseCategory(e) === category);
         const group = document.createElement('details');
         group.className = 'exercise-group';
-        group.open = category === exerciseCategory(catalog.exercises[0]);
-        const summary = cell('summary', CATEGORY_LABELS[category] || category);
+        group.open = exercises.includes(catalog.exercises[0]);
+        const summary = cell('summary', categoryLabel);
         summary.className = 'group-label';
-        groupList = document.createElement('div');
+        const groupList = document.createElement('div');
         groupList.className = 'exercise-list';
         group.append(summary, groupList);
         group.addEventListener('toggle', () => {
           if (group.open) document.querySelectorAll('.exercise-group').forEach((other) => { if (other !== group) other.open = false; });
         });
-        $('exercises').append(group);
-        previous = category;
+        for (const e of exercises) {
+          const b = document.createElement('button'); b.className = 'exercise'; b.dataset.id = e.id; b.append(cell('span', e.id), document.createTextNode(`${e.title}${e.optional ? ' · 선택' : ''}`)); b.addEventListener('click', () => select(e)); groupList.append(b);
+        }
+        if (!exercises.length) groupList.append(cell('p', '아직 등록된 문제가 없어요.'));
+        section.append(group);
       }
-      const b = document.createElement('button'); b.className = 'exercise'; b.dataset.id = e.id; b.append(cell('span', e.id), document.createTextNode(e.title)); b.addEventListener('click', () => select(e)); groupList.append(b);
-    });
+      $('exercises').append(section);
+    }
     await select(catalog.exercises[0]);
     $('open-source').disabled = false;
     try { await api('/api/health'); $('connection').textContent = window.SqlLabPagesApi ? '브라우저 DB 준비됨' : 'Supabase 연결됨'; }
