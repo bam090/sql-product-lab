@@ -114,8 +114,11 @@ export function comparisonExercise(exercise) {
 
 export function starterSql(exercise, schema) {
   const lines = [`-- ${exercise.id} · ${exercise.title}`];
-  if (exercise.concept) lines.push(`-- 한 줄 개념: ${exercise.concept}`);
-  if (exercise.syntaxFrame) lines.push(`-- 문법 틀: ${exercise.syntaxFrame}`);
+  if (exercise.scenario) lines.push(`-- 상황: ${exercise.scenario}`);
+  if (exercise.level === 'basic') {
+    if (exercise.concept) lines.push(`-- 한 줄 개념: ${exercise.concept}`);
+    if (exercise.syntaxFrame) lines.push(`-- 문법 틀: ${exercise.syntaxFrame}`);
+  }
   if (schema?.name && schema?.table) {
     const tables = exercise.tables || [schema.table];
     lines.push(`-- 대상 테이블: ${tables.map(table => `${schema.name}.${table}`).join(', ')}`);

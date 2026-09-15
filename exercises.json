@@ -716,10 +716,11 @@
     },
     {
       "id": "S1",
-      "title": "필요한 상품 열만 조회",
+      "title": "상품 목록용 정보 조회",
       "branch": "codex/select",
       "category": "select",
       "level": "applied",
+      "scenario": "상품 목록 화면에 상품 번호, 이름, 카테고리를 표시하려고 합니다.",
       "requirements": [
         "product_id를 id로 반환한다.",
         "product_name을 name으로 반환한다.",
@@ -1016,10 +1017,11 @@
     },
     {
       "id": "S3",
-      "title": "카테고리 중복 제거",
+      "title": "검색 필터용 카테고리 조회",
       "branch": "codex/select",
       "category": "select",
       "level": "applied",
+      "scenario": "상품 검색 필터에 표시할 카테고리 선택지를 중복 없이 준비하려고 합니다.",
       "requirements": [
         "category의 중복을 제거한다.",
         "category 오름차순으로 정렬한다."
@@ -1340,57 +1342,50 @@
     },
     {
       "id": "I1",
-      "title": "입고 준비 목록 통합 조회",
+      "title": "판매 가능한 상품의 재고 금액 확인",
       "branch": "codex/integration",
       "category": "where",
       "level": "applied",
+      "scenario": "현재 판매할 수 있는 상품별 재고 금액을 확인하려고 합니다.",
+      "revisionNote": "요구사항이 변경되었습니다. 기존 풀이를 새 조건에 맞춰 수정하세요.",
       "requirements": [
-        "Electronics 또는 Books 카테고리만 대상으로 한다.",
-        "재고가 있고 2026년 9월에 출시된 상품만 남긴다.",
-        "description이 NULL도 빈 문자열도 아닌 상품만 남긴다.",
-        "product_name을 product로 반환한다.",
+        "stock_quantity가 0보다 큰 상품만 남긴다.",
+        "product_id, product_name, inventory_value를 반환한다.",
         "price와 stock_quantity를 곱하고 소수 둘째 자리까지 반올림해 inventory_value로 반환한다.",
-        "고정 문자열 ready를 status로 반환한다.",
         "product_id 오름차순으로 정렬한다."
       ],
       "columns": [
         "product_id",
-        "product",
-        "inventory_value",
-        "status"
+        "product_name",
+        "inventory_value"
       ],
       "expectedRows": [
-        [
-          4,
-          "Noise-Canceling Headphones",
-          649.95,
-          "ready"
-        ],
-        [
-          11,
-          "SQL Basics",
-          308.0,
-          "ready"
-        ],
-        [
-          12,
-          "PostgreSQL Practice",
-          219.0,
-          "ready"
-        ]
+        [1, "Wireless Mouse", 448.5],
+        [2, "Mechanical Keyboard", 712.0],
+        [4, "Noise-Canceling Headphones", 649.95],
+        [5, "Cotton T-Shirt", 597.0],
+        [6, "Linen Shirt", 540.0],
+        [8, "Desk Lamp", 238.0],
+        [9, "Ceramic Mug", 300.0],
+        [10, "Storage Basket", 88.0],
+        [11, "SQL Basics", 308.0],
+        [12, "PostgreSQL Practice", 219.0],
+        [14, "Oat Granola", 222.5],
+        [15, "Dark Chocolate", 260.0],
+        [16, "Coffee Beans", 162.0],
+        [17, "Yoga Mat", 310.0],
+        [19, "Trail Backpack", 225.0],
+        [20, "Gift Card", 5000.0]
       ],
       "hints": [
-        "IN",
-        "AND",
-        "IS NOT NULL",
-        "TRIM",
+        "WHERE stock_quantity > 0",
         "ROUND",
         "AS"
       ],
       "minutes": 7,
       "optional": false,
       "sortRequired": true,
-      "schemaNote": "카테고리, 재고, 출시 시각, 설명 상태, 가격을 한 테이블에서 함께 사용합니다."
+      "schemaNote": "price와 stock_quantity를 곱하면 각 상품의 현재 재고 금액을 계산할 수 있습니다."
     },
     {
       "id": "O1",
@@ -1673,16 +1668,16 @@
     },
     {
       "id": "T5",
-      "title": "카테고리 우선순위 정렬",
+      "title": "기획전 상품 우선순위 정렬",
       "branch": "practice/today-sql",
       "category": "order-by",
       "level": "applied",
+      "scenario": "기획전에서 전자기기 상품을 먼저, 도서 상품을 그다음에 보여 주려고 합니다.",
       "concept": "ORDER BY의 CASE 결과를 정렬 키로 사용하면 원하는 업무 우선순위를 만들 수 있습니다.",
       "syntaxFrame": "SELECT 열이름들 FROM 테이블명 ORDER BY CASE WHEN 조건1 THEN 1 WHEN 조건2 THEN 2 ELSE 3 END ASC, 고유열 ASC;",
       "requirements": [
         "product_id, product_name, category를 조회한다.",
-        "ORDER BY CASE에서 Electronics는 1, Books는 2, 나머지는 ELSE 3을 반환한다.",
-        "CASE 결과를 오름차순으로 정렬해 Electronics, Books, 나머지 순서로 배치한다.",
+        "Electronics 상품을 먼저, Books 상품을 그다음, 나머지 상품을 마지막에 배치한다.",
         "같은 우선순위 안에서는 product_id를 오름차순으로 정렬한다."
       ],
       "columns": [
@@ -1726,17 +1721,19 @@
     },
     {
       "id": "T6",
-      "title": "NULL 설명을 마지막으로 정렬",
+      "title": "설명이 등록된 상품 우선 정렬",
       "branch": "practice/today-sql",
       "category": "order-by",
       "level": "applied",
-      "concept": "CASE로 NULL 여부를 숫자로 바꾸면 NULL인 행을 마지막에 배치할 수 있습니다.",
-      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 ORDER BY CASE WHEN 열이름 IS NULL THEN 1 ELSE 0 END ASC, 고유열 ASC;",
+      "scenario": "상품 설명 보완 작업을 위해 설명이 등록된 상품부터 확인하려고 합니다.",
+      "revisionNote": "요구사항이 변경되었습니다. 기존 풀이를 새 조건에 맞춰 수정하세요.",
+      "concept": "CASE로 NULL과 빈 문자열 여부를 숫자로 바꾸면 설명이 없는 행을 마지막에 배치할 수 있습니다.",
+      "syntaxFrame": "SELECT 열이름들 FROM 테이블명 ORDER BY CASE WHEN 열이름 IS NULL OR TRIM(열이름) = '' THEN 1 ELSE 0 END ASC, 고유열 ASC;",
       "requirements": [
         "product_id, product_name, description을 조회한다.",
-        "description이 NULL이면 1, 아니면 ELSE 0을 반환하는 CASE를 정렬 기준으로 사용한다.",
-        "CASE 결과를 오름차순으로 정렬해 NULL인 행을 마지막에 배치한다.",
-        "NULL 여부가 같으면 product_id를 오름차순으로 정렬한다. 빈 문자열은 NULL이 아니다."
+        "TRIM한 description이 비어 있지 않은 상품을 먼저 배치한다.",
+        "description이 NULL이거나 TRIM한 뒤 빈 문자열인 상품은 마지막에 배치한다.",
+        "두 그룹 안에서는 product_id를 오름차순으로 정렬한다."
       ],
       "columns": [
         "product_id",
@@ -1745,29 +1742,30 @@
       ],
       "expectedRows": [
         [1, "Wireless Mouse", "Compact wireless mouse"],
-        [3, "USB-C Hub", ""],
         [4, "Noise-Canceling Headphones", "Over-ear design"],
         [5, "Cotton T-Shirt", "  Basic fit  "],
-        [7, "Running Socks", ""],
         [8, "Desk Lamp", "Warm light"],
         [10, "Storage Basket", "Woven basket"],
         [11, "SQL Basics", "Beginner SQL guide"],
         [12, "PostgreSQL Practice", "Hands-on workbook"],
-        [13, "Spring Boot Intro", ""],
         [14, "Oat Granola", "No added sugar"],
         [16, "Coffee Beans", "Medium roast"],
         [17, "Yoga Mat", "Non-slip surface"],
         [18, "Steel Bottle", "750ml"],
-        [19, "Trail Backpack", ""],
         [20, "Gift Card", "Digital delivery"],
         [2, "Mechanical Keyboard", null],
+        [3, "USB-C Hub", ""],
         [6, "Linen Shirt", null],
+        [7, "Running Socks", ""],
         [9, "Ceramic Mug", null],
-        [15, "Dark Chocolate", null]
+        [13, "Spring Boot Intro", ""],
+        [15, "Dark Chocolate", null],
+        [19, "Trail Backpack", ""]
       ],
       "hints": [
         "ORDER BY CASE",
         "IS NULL",
+        "TRIM(description) = ''",
         "THEN 1",
         "ELSE 0"
       ],
@@ -1775,7 +1773,7 @@
       "optional": false,
       "sortRequired": true,
       "orderMatters": true,
-      "schemaNote": "description은 원본 열입니다. 빈 문자열은 ELSE 0 그룹에 포함되고 NULL만 마지막 그룹으로 이동합니다."
+      "schemaNote": "description에는 NULL과 빈 문자열이 각각 있으며, 앞뒤 공백을 제거한 뒤 내용이 있는지 판단합니다."
     },
     {
       "id": "T7",
@@ -1974,7 +1972,7 @@
       "title": "마지막 상품 다음부터 이어 보기",
       "branch": "practice/pagination",
       "category": "order-by",
-      "level": "applied",
+      "level": "later",
       "concept": "keyset 페이지는 마지막으로 본 정렬 값과 고유 키를 조건에 넣어 다음 행부터 이어서 조회합니다.",
       "syntaxFrame": "SELECT 열들 FROM 테이블명 WHERE 시간열 < 기준시각 OR (시간열 = 기준시각 AND 고유열 < 기준값) ORDER BY 시간열 DESC, 고유열 DESC LIMIT 개수;",
       "requirements": [
@@ -2050,7 +2048,7 @@
       "title": "두 재고 목록의 앞부분 합치기",
       "branch": "practice/pagination",
       "category": "order-by",
-      "level": "applied",
+      "level": "later",
       "concept": "분기별 정렬과 LIMIT을 UNION ALL 안쪽에 적용하고, 바깥 SELECT의 ORDER BY로 합친 전체 결과를 정렬합니다.",
       "syntaxFrame": "SELECT 열들 FROM ((SELECT ... ORDER BY ... LIMIT ...) UNION ALL (SELECT ...)) AS 합친결과 ORDER BY 구분열, 정렬열;",
       "requirements": [
@@ -2348,7 +2346,7 @@
       "id": "J6",
       "title": "같은 카테고리의 상품 쌍 찾기",
       "category": "joins",
-      "level": "applied",
+      "level": "basic",
       "branch": "practice/joins",
       "tables": [
         "products"
@@ -2396,7 +2394,7 @@
         "p1.product_id < p2.product_id"
       ],
       "minutes": 8,
-      "optional": false,
+      "optional": true,
       "sortRequired": true,
       "orderMatters": true,
       "schemaNote": "같은 category 조건만 쓰면 자기 쌍과 순서만 뒤집힌 거울 쌍이 함께 생깁니다."
@@ -2405,7 +2403,7 @@
       "id": "J7",
       "title": "가격을 가격 밴드에 연결",
       "category": "joins",
-      "level": "applied",
+      "level": "later",
       "branch": "practice/joins",
       "tables": [
         "products",
@@ -2459,7 +2457,7 @@
         "겹치는 구간"
       ],
       "minutes": 7,
-      "optional": false,
+      "optional": true,
       "sortRequired": true,
       "orderMatters": true,
       "schemaNote": "Budget과 Standard, Standard와 Premium 구간이 일부 겹쳐 여러 밴드와 매칭되는 상품이 있습니다."
@@ -2468,7 +2466,7 @@
       "id": "J8",
       "title": "상품과 카테고리 전체 대조",
       "category": "joins",
-      "level": "basic",
+      "level": "later",
       "branch": "practice/joins",
       "tables": [
         "categories",
@@ -2518,59 +2516,57 @@
         "NULLS LAST"
       ],
       "minutes": 8,
-      "optional": false,
+      "optional": true,
       "sortRequired": true,
       "orderMatters": true,
       "schemaNote": "Stationery는 카테고리 쪽에만, Other인 Gift Card는 상품 쪽에만 있습니다."
     },
     {
       "id": "J9",
-      "title": "도서 상품에 두 표 연속 연결",
+      "title": "도서 상품 가격 목록",
       "category": "joins",
       "level": "applied",
       "branch": "practice/joins",
       "tables": [
         "products",
-        "categories",
-        "price_bands"
+        "categories"
       ],
-      "concept": "앞 JOIN의 결과에 다음 JOIN을 이어 쓰면 한 조회에서 세 테이블의 정보를 연결할 수 있습니다.",
-      "syntaxFrame": "SELECT 열들 FROM 테이블1 AS 별칭1 INNER JOIN 테이블2 AS 별칭2 ON 조건 INNER JOIN 테이블3 AS 별칭3 ON 조건 WHERE 조건 ORDER BY 정렬열들;",
+      "scenario": "도서 상품 목록에 카테고리 이름과 가격을 함께 표시하려고 합니다.",
+      "revisionNote": "요구사항이 변경되었습니다. 기존 풀이를 새 조건에 맞춰 수정하세요.",
+      "concept": "INNER JOIN으로 두 테이블의 category가 같은 행을 연결할 수 있습니다.",
+      "syntaxFrame": "SELECT 열들 FROM 테이블1 AS 별칭1 INNER JOIN 테이블2 AS 별칭2 ON 별칭1.열 = 별칭2.열 WHERE 조건 ORDER BY 정렬열들;",
       "requirements": [
         "products에서 시작해 categories를 category가 같은 조건으로 INNER JOIN한다.",
-        "이어서 price_bands를 price가 min_price 이상 max_price 이하인 조건으로 INNER JOIN한다.",
-        "Books 상품만 product_id, product_name, category_name, band_name, price 순서로 반환한다.",
-        "price 내림차순, product_id 오름차순, band_id 오름차순으로 정렬한다."
+        "Books 상품만 product_id, product_name, category_name, price 순서로 반환한다.",
+        "price 내림차순, product_id 오름차순으로 정렬한다."
       ],
       "columns": [
         "product_id",
         "product_name",
         "category_name",
-        "band_name",
         "price"
       ],
       "expectedRows": [
-        [13, "Spring Boot Intro", "도서", "Standard", 41.0],
-        [12, "PostgreSQL Practice", "도서", "Standard", 36.5],
-        [11, "SQL Basics", "도서", "Budget", 28.0],
-        [11, "SQL Basics", "도서", "Standard", 28.0]
+        [13, "Spring Boot Intro", "도서", 41.0],
+        [12, "PostgreSQL Practice", "도서", 36.5],
+        [11, "SQL Basics", "도서", 28.0]
       ],
       "hints": [
-        "products → categories → price_bands",
-        "INNER JOIN을 두 번 이어 쓰기",
-        "마지막 동점 기준은 band_id"
+        "INNER JOIN practice.categories",
+        "ON products.category = categories.category",
+        "WHERE products.category = 'Books'"
       ],
       "minutes": 8,
-      "optional": true,
+      "optional": false,
       "sortRequired": true,
       "orderMatters": true,
-      "schemaNote": "SQL Basics는 겹치는 두 가격 밴드에 연결되므로 band_id를 마지막 정렬 기준으로 사용합니다."
+      "schemaNote": "products와 categories의 category가 같은 도서 상품만 연결합니다."
     },
     {
       "id": "J10",
       "title": "더 비싼 식품이 없는 행도 남기기",
       "category": "joins",
-      "level": "applied",
+      "level": "basic",
       "branch": "practice/joins",
       "tables": [
         "products"

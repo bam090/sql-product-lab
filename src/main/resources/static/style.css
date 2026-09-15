@@ -20,6 +20,8 @@ h3 { margin: 0; font-size: 17px; letter-spacing: -.35px; }
 .muted { color: var(--muted); font-size: 13px; }
 .small { font-size: 12px; min-height: 19px; margin-bottom: 0; }
 nav { margin-top: 30px; }
+#scenario { font-size: 14px; line-height: 1.7; }
+#syntax-help > summary { cursor: pointer; font-size: 13px; color: var(--muted); }
 .exercise-level + .exercise-level { margin-top: 26px; }
 .exercise-level > summary { margin: 0 0 9px; font-size: 19px; font-weight: 800; color: var(--ink); cursor: pointer; }
 .exercise-level > summary::marker { color: #52796f; }

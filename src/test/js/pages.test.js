@@ -22,6 +22,8 @@ test('Pages starters are generated from the catalog without local answer files',
     assert.match(sql, new RegExp(`^-- ${exercise.id} ·`));
     assert.match(sql, /-- TODO:/);
     assert.doesNotMatch(sql, /^(?!\s*--).*\bSELECT\b/im);
+    if (exercise.level !== 'basic') assert.doesNotMatch(sql, /-- 문법 틀:/);
+    if (exercise.scenario) assert.ok(sql.includes(exercise.scenario));
     for (const table of exercise.tables || [catalog.schema.table]) assert.ok(sql.includes(`practice.${table}`));
   }
 });

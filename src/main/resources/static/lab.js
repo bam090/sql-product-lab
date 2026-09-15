@@ -4,7 +4,7 @@ let sourceDialogTrigger = null, sourceRevision = 0;
 let autocompleteCandidates = [], autocompleteMatch = null, autocompleteIndex = 0, composing = false, tabMovesFocus = false;
 const drafts = new Map();
 let currentSchema;
-const LEVEL_LABELS = { basic: '기본 개념 문제', applied: '응용 문제' };
+const LEVEL_LABELS = { basic: '기본 개념 문제', applied: '응용 문제', later: '선택 심화 · 오늘 범위 제외' };
 const CATEGORY_LABELS = {
   'select': '01 SELECT · 열과 결과 만들기',
   'where': '02 WHERE · 조건으로 고르기',
@@ -176,12 +176,18 @@ async function select(exercise) {
   showSchema(schemas[0]);
   autocompleteCandidates = SqlAutocomplete.createCandidates(schemas);
   $('title').textContent = exercise.title;
+  $('scenario').textContent = exercise.scenario || '';
+  $('scenario').hidden = !exercise.scenario;
+  $('revision-note').textContent = exercise.revisionNote || '';
+  $('revision-note').hidden = !exercise.revisionNote;
   $('step').textContent = `${exercise.id} / ${LEVEL_LABELS[exercise.level] || '기본 개념 문제'}${exercise.optional ? ' · 선택 연습' : ''}`;
   $('minutes').textContent = `약 ${exercise.minutes}분`;
   $('filename').textContent = window.SqlLabPagesApi ? `브라우저 저장 · ${exercise.id}` : `sql/${exercise.id}.sql`;
   $('requirements').replaceChildren(...exercise.requirements.map((r) => cell('li', r)));
   $('syntax-frame').hidden = !exercise.syntaxFrame;
   $('syntax-frame').textContent = exercise.syntaxFrame ? `문법 틀: ${exercise.syntaxFrame}` : '';
+  $('syntax-help').open = exercise.level === 'basic';
+  $('before-hints').textContent = exercise.hints.join(' · ');
   $('hints').textContent = exercise.hints.join(' · ');
   table($('expected'), exercise.columns, exercise.expectedRows);
   document.querySelectorAll('.exercise').forEach((b) => { b.classList.toggle('active', b.dataset.id === exercise.id); b.setAttribute('aria-current', b.dataset.id === exercise.id ? 'step' : 'false'); });

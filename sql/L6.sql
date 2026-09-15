@@ -1,6 +1,4 @@
 -- L6 · 두 재고 목록의 앞부분 합치기
--- 한 줄 개념: 분기별 정렬과 LIMIT을 UNION ALL 안쪽에 적용하고, 바깥 SELECT의 ORDER BY로 합친 전체 결과를 정렬합니다.
--- 문법 틀: SELECT 열들 FROM ((SELECT ... ORDER BY ... LIMIT ...) UNION ALL (SELECT ...)) AS 합친결과 ORDER BY 구분열, 정렬열;
 -- 대상 테이블: practice.products
 -- 반환 열: queue_source, sort_id, product_name
 -- 첫 SELECT는 재고가 0인 상품을 product_id 오름차순으로 정렬해 2행만 고르고 queue_source를 sold_out으로 반환한다.

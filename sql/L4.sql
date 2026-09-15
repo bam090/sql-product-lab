@@ -1,6 +1,4 @@
 -- L4 · 마지막 상품 다음부터 이어 보기
--- 한 줄 개념: keyset 페이지는 마지막으로 본 정렬 값과 고유 키를 조건에 넣어 다음 행부터 이어서 조회합니다.
--- 문법 틀: SELECT 열들 FROM 테이블명 WHERE 시간열 < 기준시각 OR (시간열 = 기준시각 AND 고유열 < 기준값) ORDER BY 시간열 DESC, 고유열 DESC LIMIT 개수;
 -- 대상 테이블: practice.products
 -- 반환 열: product_id, product_name, released_at
 -- product_id, product_name, released_at을 조회한다.

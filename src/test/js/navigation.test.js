@@ -4,7 +4,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const test = require('node:test');
 
-test('navigation renders two levels with four categories and keeps every exercise selectable', async () => {
+test('navigation separates today practice from deferred exercises and keeps every exercise selectable', async () => {
   const root = path.resolve(__dirname, '../../..');
   const catalog = JSON.parse(fs.readFileSync(path.join(root, 'exercises.json'), 'utf8'));
   const source = fs.readFileSync(path.join(root, 'src/main/resources/static/lab.js'), 'utf8');
@@ -32,10 +32,10 @@ test('navigation renders two levels with four categories and keeps every exercis
   vm.runInContext(source.slice(source.indexOf('async function init()')).replace(/init\(\);\s*$/, ''), context);
   await context.init();
   const sections = nodes.get('exercises').children;
-  assert.deepEqual(sections.map(section => section.tag), ['details', 'details']);
-  assert.deepEqual(sections.map(section => section.children[0].tag), ['summary', 'summary']);
-  assert.deepEqual(sections.map(section => section.open), [true, false]);
-  assert.deepEqual(sections.map(section => section.children[0].textContent), ['기본 개념 문제', '응용 문제']);
+  assert.deepEqual(sections.map(section => section.tag), ['details', 'details', 'details']);
+  assert.deepEqual(sections.map(section => section.children[0].tag), ['summary', 'summary', 'summary']);
+  assert.deepEqual(sections.map(section => section.open), [true, false, false]);
+  assert.deepEqual(sections.map(section => section.children[0].textContent), ['기본 개념 문제', '응용 문제', '선택 심화 · 오늘 범위 제외']);
   const buttons = [];
   for (const section of sections) {
     const groups = section.children.slice(1);
@@ -44,5 +44,7 @@ test('navigation renders two levels with four categories and keeps every exercis
     buttons.push(...groups.flatMap(group => group.children[1].children.filter(node => node.tag === 'button')));
   }
   assert.deepEqual(buttons.map(button => button.dataset.id).sort(), catalog.exercises.map(exercise => exercise.id).sort());
+  const laterIds = sections[2].children.slice(1).flatMap(group => group.children[1].children.filter(node => node.tag === 'button').map(node => node.dataset.id));
+  assert.deepEqual(laterIds.sort(), ['J7', 'J8', 'L4', 'L6']);
   for (const button of buttons) { await button.listeners.click(); assert.equal(selected, button.dataset.id); }
 });

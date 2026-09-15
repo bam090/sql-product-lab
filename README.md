@@ -26,9 +26,9 @@
 | SELECT | 열 선택, 별칭, 문자열, 계산, CASE, GROUP BY·COUNT |
 | WHERE | AND/OR, IN, BETWEEN, LIKE, NULL, 여러 조건 조합 |
 | ORDER BY | 오름차순·내림차순, 여러 정렬 기준, 별칭, NULL 위치, LIMIT·OFFSET 페이지, keyset 커서 |
-| JOIN | INNER·LEFT·SELF·CROSS·FULL, 연속 JOIN, USING, 연결 후 개수 세기, 가격 범위 연결 |
+| JOIN | INNER·LEFT·SELF·CROSS·FULL, USING, 연결 후 개수 세기, 카테고리 연결 |
 
-총 **50문제**입니다. 화면에서는 **기본 개념 문제**와 **응용 문제**를 고르고, 각 묶음에서 SELECT·WHERE·ORDER BY·JOIN 분류를 접고 펼칠 수 있어요. 기본 개념 문제는 문법 하나에 집중하고, 응용 문제는 현재 배운 범위에서 실무 상황을 조합합니다. 문자열 연결, keyset 커서, 범위 배치, UNION ALL 조합, 연속 JOIN과 self LEFT JOIN은 선택 문제입니다. 브랜치를 바꿀 필요는 없습니다.
+총 **50문제**입니다. 오늘은 수업 JOIN 1~10번의 학습 범위를 기준으로 하며 실험실 J7·J8은 **선택 심화 · 오늘 범위 제외**로 분리했습니다. 화면에서는 **기본 개념 문제**와 **응용 문제**를 먼저 풀고, 선택 심화는 접힌 별도 목차에서 확인할 수 있어요. 기본 개념 문제는 문법 하나에 집중하고, 응용 문제는 현재 배운 범위에서 실무 상황을 조합합니다. 문자열 연결과 self JOIN은 선택 문제이며, 가격 범위 JOIN·FULL OUTER JOIN·keyset 커서·UNION ALL 조합은 선택 심화입니다. 브랜치를 바꿀 필요는 없습니다.
 
 JOIN에서는 왼쪽의 **확인할 테이블**을 바꿔 구조를 살펴보고 **원본 테이블 보기**로 데이터를 확인하세요. SQL 파일에서는 요구사항 주석 아래에 SELECT 문 하나를 작성합니다.
 
