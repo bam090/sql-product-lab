@@ -1,6 +1,6 @@
 -- T5 · 기획전 상품 우선순위 정렬
 -- 상황: 기획전에서 전자기기 상품을 먼저, 도서 상품을 그다음에 보여 주려고 합니다.
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, category
 -- product_id, product_name, category를 조회한다.
 -- Electronics 상품을 먼저, Books 상품을 그다음, 나머지 상품을 마지막에 배치한다.

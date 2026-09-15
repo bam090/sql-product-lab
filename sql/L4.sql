@@ -1,5 +1,5 @@
 -- L4 · 마지막 상품 다음부터 이어 보기
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, released_at
 -- product_id, product_name, released_at을 조회한다.
 -- 마지막으로 본 행은 released_at이 2026-10-01 00:00:00이고 product_id가 16인 상품이라고 가정한다.

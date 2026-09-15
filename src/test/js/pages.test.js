@@ -24,7 +24,10 @@ test('Pages starters are generated from the catalog without local answer files',
     assert.doesNotMatch(sql, /^(?!\s*--).*\bSELECT\b/im);
     if (exercise.level !== 'basic') assert.doesNotMatch(sql, /-- 문법 틀:/);
     if (exercise.scenario) assert.ok(sql.includes(exercise.scenario));
-    for (const table of exercise.tables || [catalog.schema.table]) assert.ok(sql.includes(`practice.${table}`));
+    for (const table of exercise.tables || [catalog.schema.table]) {
+      assert.ok(sql.includes(`-- 대상 테이블: `) && sql.includes(table));
+      assert.ok(!sql.includes(`practice.${table}`));
+    }
   }
 });
 

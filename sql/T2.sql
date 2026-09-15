@@ -1,7 +1,7 @@
 -- T2 · 가격대별 보너스 점수
 -- 한 줄 개념: CASE는 위에서부터 조건을 확인하고 처음 맞는 결과를 반환하며, ELSE는 나머지를 처리합니다.
 -- 문법 틀: SELECT 열이름들, CASE WHEN 조건1 THEN 결과1 WHEN 조건2 THEN 결과2 ELSE 결과3 END AS 새이름 FROM 테이블명;
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, price, bonus_points
 -- product_id, product_name, price를 원본 열 이름 그대로 조회한다.
 -- price가 50 이상이면 10, 그렇지 않고 30 이상이면 5를 반환한다.

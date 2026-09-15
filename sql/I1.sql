@@ -1,7 +1,7 @@
 -- I1 · 판매 가능한 상품의 재고 금액 확인
 -- 상황: 현재 판매할 수 있는 상품별 재고 금액을 확인하려고 합니다.
 -- 알림: 요구사항이 변경되었습니다. 기존 풀이를 새 조건에 맞춰 수정하세요.
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, inventory_value
 -- stock_quantity가 0보다 큰 상품만 남긴다.
 -- product_id, product_name, inventory_value를 반환한다.

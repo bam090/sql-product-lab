@@ -1,7 +1,7 @@
 -- T6 · 설명이 등록된 상품 우선 정렬
 -- 상황: 상품 설명 보완 작업을 위해 설명이 등록된 상품부터 확인하려고 합니다.
 -- 알림: 요구사항이 변경되었습니다. 기존 풀이를 새 조건에 맞춰 수정하세요.
--- 대상 테이블: practice.products
+-- 대상 테이블: products
 -- 반환 열: product_id, product_name, description
 -- product_id, product_name, description을 조회한다.
 -- TRIM한 description이 비어 있지 않은 상품을 먼저 배치한다.

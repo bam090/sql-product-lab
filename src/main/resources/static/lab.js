@@ -20,7 +20,7 @@ function exerciseSchemas(exercise) {
 }
 function showSchema(schema) {
   currentSchema = schema;
-  $('schema-title').textContent = `${schema.name}.${schema.table}`;
+  $('schema-title').textContent = schema.table;
   $('schema-description').textContent = schema.description;
   $('schema-count').textContent = `${schema.seedRowCount}행`;
   $('schema').replaceChildren(...schema.columns.map((column) => {
@@ -54,6 +54,11 @@ function table(target, columns, rows) {
   const body = document.createElement('tbody');
   rows.forEach((row) => { const r = document.createElement('tr'); row.forEach((v) => r.append(cell('td', v))); body.append(r); });
   t.append(body); target.append(t);
+}
+function placeholder(text) {
+  const message = cell('p', text);
+  message.className = 'empty';
+  return message;
 }
 function error(message) { $('error').hidden = !message; $('error').textContent = message; }
 function adjustIndent(text, start, end, outdent) {
@@ -195,7 +200,7 @@ async function select(exercise) {
   $('topic-title').textContent = CATEGORY_LABELS[exerciseCategory(exercise)] || '상품 조회 SQL 연습';
   const schemas = exerciseSchemas(exercise);
   $('table-choice').replaceChildren(...schemas.map((schema) => {
-    const option = cell('option', `${schema.name}.${schema.table}`);
+    const option = cell('option', schema.table);
     option.value = schema.table;
     return option;
   }));
@@ -214,14 +219,16 @@ async function select(exercise) {
   $('requirements').replaceChildren(...exercise.requirements.map((r) => cell('li', r)));
   $('syntax-frame').hidden = !exercise.syntaxFrame;
   $('syntax-frame').textContent = exercise.syntaxFrame ? `문법 틀: ${exercise.syntaxFrame}` : '';
-  $('syntax-help').open = exercise.level === 'basic';
+  $('syntax-help').open = false;
+  $('problem-details').open = true;
   $('before-hints').textContent = exercise.hints.join(' · ');
-  $('hints').textContent = exercise.hints.join(' · ');
+  $('concept').textContent = exercise.concept || '';
+  $('concept-panel').hidden = !exercise.concept;
   table($('expected'), exercise.columns, exercise.expectedRows);
   document.querySelectorAll('.exercise').forEach((b) => { b.classList.toggle('active', b.dataset.id === exercise.id); b.setAttribute('aria-current', b.dataset.id === exercise.id ? 'step' : 'false'); });
   error(''); comparison(''); $('result-meta').textContent = '';
   $('after-run').hidden = true;
-  $('result').replaceChildren(cell('p', 'SQL을 실행하면 실제 조회 결과가 표시됩니다.'));
+  $('result').replaceChildren(placeholder('SQL을 실행하면 실제 조회 결과가 표시됩니다.'));
   await load(false);
 }
 async function load(force) {
@@ -256,7 +263,7 @@ async function run() {
   if (busy || !current || $('sql').readOnly) return;
   closeAutocomplete();
   busy = true; $('run').disabled = true; $('run').textContent = '실행 중…'; error(''); comparison('실행 결과를 확인하고 있어요…', 'loading');
-  $('result-meta').textContent = ''; $('result').replaceChildren(cell('p', 'SQL을 실행하고 있어요…'));
+  $('result-meta').textContent = ''; $('result').replaceChildren(placeholder('SQL을 실행하고 있어요…'));
   $('after-run').hidden = false;
   try {
     const result = await api('/api/query', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exerciseId: current.id, sql: $('sql').value }) });
@@ -266,7 +273,7 @@ async function run() {
     const same = SqlResultComparison.matches(result, comparedExercise);
     const retry = current.orderMatters === false ? '반환 열과 값을 확인해 보세요.' : '반환 열·값·정렬 순서를 확인해 보세요.';
     comparison(same ? '정답이에요 · 기대 결과와 같아요' : `아직 정답이 아니에요 · ${retry}`, same ? '' : 'mismatch');
-  } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(); $('result-meta').textContent = ''; }
+  } catch (e) { comparison(''); error(e.message); $('result').replaceChildren(placeholder('실행하지 못했어요. 위의 오류 내용을 확인해 주세요.')); $('result-meta').textContent = ''; }
   finally { busy = false; $('run').disabled = false; $('run').textContent = '실행하기 →'; }
 }
 $('run').addEventListener('click', run);
@@ -299,7 +306,7 @@ async function openSourceTable() {
   const exerciseId = current.id;
   const schema = currentSchema;
   const sourceSql = `SELECT * FROM ${schema.name}.${schema.table} ORDER BY ${schema.columns[0].name}`;
-  $('source-dialog-title').textContent = `원본 테이블 · ${schema.name}.${schema.table}`;
+  $('source-dialog-title').textContent = `원본 테이블 · ${schema.table}`;
   $('source-description').textContent = `${schema.columns[0].name} 순서로 보여줍니다.`;
   sourceDialogTrigger = $('open-source');
   $('source-error').hidden = true;
@@ -330,6 +337,17 @@ async function openSourceTable() {
   }
 }
 $('open-source').addEventListener('click', openSourceTable);
+// ⌘/Ctrl + B: 편집 중에도 원본 테이블을 열고 닫는다. Shift 조합은 브라우저 북마크바 몫으로 남긴다.
+// 한글 입력 상태에서는 e.key가 'ㅠ'로 들어오므로 물리 키(e.code)를 먼저 본다.
+document.addEventListener('keydown', (e) => {
+  if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+  if (e.code !== 'KeyB' && e.key.toLowerCase() !== 'b') return;
+  const dialog = $('source-dialog');
+  if (dialog.open) { e.preventDefault(); dialog.close(); return; }
+  if ($('open-source').disabled) return;
+  e.preventDefault();
+  openSourceTable();
+});
 $('table-choice').addEventListener('change', () => {
   showSchema(exerciseSchemas(current).find((schema) => schema.table === $('table-choice').value));
 });
